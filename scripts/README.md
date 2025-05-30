@@ -1,6 +1,6 @@
 # RGS Scripts 🛠️
 
-This directory contains utility scripts for the RGS (Round Golf System) project. These scripts help with development, testing, database management, and API interaction.
+This directory contains utility scripts for the RGS (Rykket's Golf Service) project. These scripts help with development, testing, database management, and API interaction.
 
 ## 📋 Available Scripts
 

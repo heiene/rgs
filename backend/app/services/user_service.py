@@ -195,6 +195,32 @@ class UserService:
         return True
 
     @staticmethod
+    def activate_user(user_id: int) -> bool:
+        """Activate a user"""
+        user = User.query.get(user_id)
+        if not user:
+            return False
+        
+        user.is_active = True
+        user.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return True
+
+    @staticmethod
+    def toggle_admin_status(user_id: int) -> Optional[Dict[str, Any]]:
+        """Toggle user admin status"""
+        user = User.query.get(user_id)
+        if not user:
+            return None
+        
+        user.is_admin = not user.is_admin
+        user.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        return user.to_dict(include_sensitive=True)
+
+    @staticmethod
     def delete_user(user_id: int) -> bool:
         """Delete a user permanently (hard delete)"""
         user = User.query.get(user_id)

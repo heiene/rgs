@@ -118,6 +118,18 @@
           </div>
           
           <div class="form-group">
+            <label for="register-sex">Gender</label>
+            <select 
+              id="register-sex"
+              v-model="registerForm.sex" 
+              class="form-input"
+            >
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
             <label for="register-password">Password</label>
             <input 
               id="register-password"
@@ -216,7 +228,8 @@ export default {
       last_name: '',
       email: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      sex: 'M'
     })
     
     const passwordsMatch = computed(() => {
@@ -240,7 +253,8 @@ export default {
         first_name: registerForm.value.first_name,
         last_name: registerForm.value.last_name,
         email: registerForm.value.email,
-        password: registerForm.value.password
+        password: registerForm.value.password,
+        sex: registerForm.value.sex
       }
       
       const result = await authStore.register(userData)
@@ -400,6 +414,12 @@ export default {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Select specific styling */
+select.form-input {
+  background-color: white;
+  cursor: pointer;
 }
 
 .form-actions {

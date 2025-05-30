@@ -267,6 +267,68 @@ def deactivate_user(user_id):
         }), 500
 
 
+@user_bp.route('/<int:user_id>/activate', methods=['POST'])
+@admin_required
+def activate_user(user_id):
+    """Activate a user (admin only)"""
+    try:
+        success = UserService.activate_user(user_id)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+            
+        return jsonify({
+            'success': True,
+            'message': 'User activated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to activate user',
+            'message': str(e)
+        }), 500
+
+
+@user_bp.route('/<int:user_id>/toggle-admin', methods=['POST'])
+@admin_required
+def toggle_admin_status(user_id):
+    """Toggle user admin status (admin only)"""
+    try:
+        current_user_id = int(get_jwt_identity())
+        
+        # Prevent admin from removing their own admin status
+        if current_user_id == user_id:
+            return jsonify({
+                'success': False,
+                'error': 'You cannot modify your own admin status'
+            }), 400
+        
+        updated_user = UserService.toggle_admin_status(user_id)
+        
+        if not updated_user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+            
+        return jsonify({
+            'success': True,
+            'data': updated_user,
+            'message': 'Admin status updated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to update admin status',
+            'message': str(e)
+        }), 500
+
+
 @user_bp.route('/<int:user_id>/password', methods=['PUT'])
 @token_required
 def update_password(user_id):

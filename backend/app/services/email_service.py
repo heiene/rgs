@@ -115,7 +115,7 @@ class EmailService:
             button_html = f"""
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{button_url}" style="
-                    background-color: #4CAF50;
+                    background-color: #2563eb;
                     border: none;
                     color: white;
                     padding: 15px 32px;
@@ -123,8 +123,10 @@ class EmailService:
                     text-decoration: none;
                     display: inline-block;
                     font-size: 16px;
+                    font-weight: 500;
                     margin: 4px 2px;
-                    border-radius: 4px;
+                    border-radius: 6px;
+                    transition: background-color 0.2s ease;
                 ">{button_text}</a>
             </div>
             """
@@ -138,51 +140,87 @@ class EmailService:
             <title>{title}</title>
             <style>
                 body {{
-                    font-family: Arial, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                     line-height: 1.6;
-                    color: #333;
+                    color: #1e293b;
                     max-width: 600px;
                     margin: 0 auto;
                     padding: 20px;
+                    background-color: #f8fafc;
+                }}
+                .email-container {{
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+                    border: 1px solid #e2e8f0;
+                    overflow: hidden;
                 }}
                 .header {{
-                    background-color: #f8f9fa;
-                    padding: 20px;
+                    background-color: #ffffff;
+                    padding: 30px 30px 20px 30px;
                     text-align: center;
-                    border-radius: 8px 8px 0 0;
+                    border-bottom: 1px solid #e2e8f0;
                 }}
                 .content {{
                     background-color: #ffffff;
                     padding: 30px;
-                    border-radius: 0 0 8px 8px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }}
                 .footer {{
                     text-align: center;
                     margin-top: 30px;
-                    color: #666;
+                    padding: 20px 30px;
+                    background-color: #f8fafc;
+                    color: #64748b;
                     font-size: 14px;
+                    border-top: 1px solid #e2e8f0;
+                }}
+                h1 {{
+                    color: #1e293b;
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }}
+                p {{
+                    margin: 0 0 16px 0;
+                    color: #374151;
+                }}
+                ul {{
+                    margin: 16px 0;
+                    padding-left: 20px;
+                }}
+                li {{
+                    margin-bottom: 8px;
+                    color: #374151;
+                }}
+                strong {{
+                    color: #1e293b;
+                    font-weight: 600;
                 }}
                 code {{
-                    background-color: #f1f1f1;
-                    padding: 2px 4px;
-                    border-radius: 3px;
-                    font-family: monospace;
+                    background-color: #f1f5f9;
+                    color: #1e293b;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+                    font-size: 14px;
                 }}
             </style>
         </head>
         <body>
-            <div class="header">
-                <h1 style="color: #4CAF50; margin: 0;">{heading}</h1>
-            </div>
-            <div class="content">
-                {content}
-                {button_html}
-            </div>
-            <div class="footer">
-                <p>Best regards,<br>
-                The RGS Team</p>
-                <p><small>This is an automated email from RGS (Round Golf System)</small></p>
+            <div class="email-container">
+                <div class="header">
+                    <h1>{heading}</h1>
+                </div>
+                <div class="content">
+                    {content}
+                    {button_html}
+                </div>
+                <div class="footer">
+                    <p>Best regards,<br>
+                    The RGS Team</p>
+                    <p><small>This is an automated email from RGS (Rykket's Golf Service)</small></p>
+                </div>
             </div>
         </body>
         </html>
@@ -195,7 +233,7 @@ class EmailService:
         """Send welcome email to new user"""
         try:
             msg = Message(
-                subject='Welcome to RGS - Your Golf Management System',
+                subject='Welcome to RGS - Rykket\'s Golf Service',
                 sender=current_app.config['MAIL_DEFAULT_SENDER'],
                 recipients=[user.email]
             )
@@ -204,7 +242,7 @@ class EmailService:
             content = f"""
             <p>Hello {user.first_name},</p>
             
-            <p>Welcome to RGS (Round Golf System) - your personal golf management platform!</p>
+            <p>Welcome to RGS (Rykket's Golf Service) - your personal golf management platform!</p>
             
             <p>Your account has been successfully created with the following details:</p>
             <ul>

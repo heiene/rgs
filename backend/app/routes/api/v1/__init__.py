@@ -20,6 +20,7 @@ def api_health_check():
 # Import and register route blueprints
 from .auth_routes import auth_bp
 from .user_routes import user_bp
+from .handicap_routes import handicap_bp
 from .club_routes import club_api
 from .theme_routes import theme_api
 from .course_routes import course_api
@@ -31,6 +32,7 @@ from .score_routes import score_api
 
 api_v1_bp.register_blueprint(auth_bp, url_prefix='/auth')
 api_v1_bp.register_blueprint(user_bp, url_prefix='/users')
+api_v1_bp.register_blueprint(handicap_bp, url_prefix='/handicaps')
 api_v1_bp.register_blueprint(club_api, url_prefix='/clubs')
 api_v1_bp.register_blueprint(theme_api, url_prefix='/themes')
 api_v1_bp.register_blueprint(course_api, url_prefix='/courses')

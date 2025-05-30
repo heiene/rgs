@@ -1,6 +1,6 @@
 # RGS Test Suite 🧪
 
-This directory contains the comprehensive test suite for the RGS (Round Golf System) backend. The tests ensure code quality, catch regressions, and serve as living documentation of the API behavior.
+This directory contains the comprehensive test suite for the RGS (Rykket's Golf Service) backend. The tests ensure code quality, catch regressions, and serve as living documentation of the API behavior.
 
 ## 📁 Test Organization
 

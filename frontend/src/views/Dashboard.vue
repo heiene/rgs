@@ -34,6 +34,18 @@
       <div class="welcome-section">
         <h2 class="welcome-title">Welcome back, {{ firstName }}!</h2>
         <p class="welcome-subtitle">Ready to manage your golf rounds?</p>
+        
+        <!-- Admin Navigation -->
+        <div v-if="authStore.currentUser?.is_admin" class="admin-nav">
+          <router-link to="/admin" class="admin-link">
+            🛠️ Admin Dashboard
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Handicap Management Section -->
+      <div class="handicap-section">
+        <UserHandicapManagement />
       </div>
       
       <div class="stats-grid">
@@ -158,9 +170,13 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
+import UserHandicapManagement from '@/components/UserHandicapManagement.vue'
 
 export default {
   name: 'Dashboard',
+  components: {
+    UserHandicapManagement
+  },
   setup() {
     const router = useRouter()
     const authStore = useAuthStore()
@@ -328,6 +344,30 @@ export default {
   color: #64748b;
   margin: 0;
   font-weight: 400;
+}
+
+.admin-nav {
+  margin-bottom: 2rem;
+}
+
+.admin-link {
+  background: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.admin-link:hover {
+  background: #1d4ed8;
+}
+
+.handicap-section {
+  margin-bottom: 3rem;
 }
 
 .stats-grid {
