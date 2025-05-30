@@ -37,20 +37,37 @@ body {
   background: #f8fafc;
   color: #1e293b;
   line-height: 1.6;
+  /* Mobile optimization */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 #app {
   min-height: 100vh;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
 }
 
 /* Global button styles */
 button {
   font-family: inherit;
+  /* Make buttons more touch-friendly */
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Global input styles */
 input, textarea, select {
   font-family: inherit;
+  /* Prevent zoom on iOS when font-size < 16px */
+  font-size: 16px;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 /* Utility classes for consistent spacing and styling */
@@ -114,5 +131,36 @@ input, textarea, select {
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  /* Ensure content doesn't get too close to screen edges */
+  .container {
+    padding: 0 1rem;
+  }
+  
+  /* More generous spacing on mobile */
+  .mb-1 { margin-bottom: 0.75rem; }
+  .mb-2 { margin-bottom: 1.25rem; }
+  .mb-3 { margin-bottom: 1.75rem; }
+  .mb-4 { margin-bottom: 2.25rem; }
+  
+  .mt-1 { margin-top: 0.75rem; }
+  .mt-2 { margin-top: 1.25rem; }
+  .mt-3 { margin-top: 1.75rem; }
+  .mt-4 { margin-top: 2.25rem; }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  /* Larger touch targets for small screens */
+  button {
+    min-height: 48px;
+    min-width: 48px;
+  }
 }
 </style> 

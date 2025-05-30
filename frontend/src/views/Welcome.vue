@@ -3,7 +3,7 @@
     <div class="welcome-header">
       <div class="logo-section">
         <h1 class="logo">RGS</h1>
-        <p class="tagline">Round Golf System</p>
+        <p class="tagline">Rykket's Golf Service</p>
       </div>
     </div>
     
@@ -78,7 +78,7 @@
         <!-- Register Form -->
         <form v-if="activeTab === 'register'" @submit.prevent="handleRegister" class="auth-form">
           <h2 class="form-title">Create Account</h2>
-          <p class="form-subtitle">Join the Round Golf System</p>
+          <p class="form-subtitle">Join Rykket's Golf Service</p>
           
           <div class="form-row">
             <div class="form-group">
@@ -277,7 +277,7 @@ export default {
 <style scoped>
 .welcome-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -290,7 +290,7 @@ export default {
 }
 
 .logo-section {
-  color: #2c3e50;
+  color: #1e293b;
 }
 
 .logo {
@@ -298,17 +298,14 @@ export default {
   font-weight: 800;
   margin: 0;
   letter-spacing: -2px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1e293b;
 }
 
 .tagline {
   font-size: 1.2rem;
   color: #64748b;
   margin: 0.5rem 0 0 0;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .auth-section {
@@ -318,8 +315,9 @@ export default {
 
 .auth-card {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e2e8f0;
   overflow: hidden;
 }
 
@@ -335,15 +333,15 @@ export default {
   border: none;
   background: transparent;
   color: #64748b;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .tab-button.active {
-  color: #667eea;
+  color: #2563eb;
   background: white;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #2563eb;
 }
 
 .tab-button:hover:not(.active) {
@@ -357,7 +355,7 @@ export default {
 
 .form-title {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #1e293b;
   margin: 0 0 0.5rem 0;
   text-align: center;
@@ -367,6 +365,7 @@ export default {
   color: #64748b;
   text-align: center;
   margin: 0 0 2rem 0;
+  font-weight: 400;
 }
 
 .form-row {
@@ -381,7 +380,7 @@ export default {
 
 .form-group label {
   display: block;
-  font-weight: 600;
+  font-weight: 500;
   color: #374151;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
@@ -390,8 +389,8 @@ export default {
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   font-size: 1rem;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -399,8 +398,8 @@ export default {
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .form-actions {
@@ -411,46 +410,44 @@ export default {
 .link-button {
   background: none;
   border: none;
-  color: #667eea;
+  color: #2563eb;
   cursor: pointer;
   font-size: 0.9rem;
   text-decoration: underline;
 }
 
 .link-button:hover {
-  color: #5a67d8;
+  color: #1d4ed8;
 }
 
 .submit-button {
   width: 100%;
   padding: 0.875rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .submit-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  background: #1d4ed8;
 }
 
 .submit-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .error-message {
-  background: #fee2e2;
+  background: #fef2f2;
   border: 1px solid #fecaca;
   color: #dc2626;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-top: 1rem;
   font-size: 0.9rem;
 }
@@ -471,15 +468,16 @@ export default {
 .modal-content {
   background: white;
   padding: 2rem;
-  border-radius: 16px;
+  border-radius: 12px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content h3 {
   margin: 0 0 0.5rem 0;
   color: #1e293b;
+  font-weight: 600;
 }
 
 .modal-content p {
@@ -498,15 +496,113 @@ export default {
   padding: 0.75rem;
   background: #f8fafc;
   color: #64748b;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .cancel-button:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
+}
+
+/* Add enhanced mobile styles */
+@media (max-width: 768px) {
+  .welcome-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .welcome-header {
+    margin-bottom: 2rem;
+  }
+  
+  .logo {
+    font-size: 3rem;
+  }
+  
+  .tagline {
+    font-size: 1rem;
+  }
+  
+  .auth-section {
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+  
+  .auth-card {
+    margin: 0;
+    border-radius: 8px;
+  }
+  
+  .auth-form {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-input {
+    padding: 1rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 8px;
+  }
+  
+  .submit-button {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  
+  .tab-button {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    padding: 1.5rem;
+    max-width: none;
+    width: calc(100% - 2rem);
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-button,
+  .modal-actions .submit-button {
+    width: 100%;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-container {
+    padding: 0.5rem;
+  }
+  
+  .logo {
+    font-size: 2.5rem;
+  }
+  
+  .auth-form {
+    padding: 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+  }
+  
+  .form-subtitle {
+    font-size: 0.9rem;
+  }
 }
 </style> 

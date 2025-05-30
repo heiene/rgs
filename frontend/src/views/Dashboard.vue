@@ -4,7 +4,7 @@
       <div class="header-content">
         <div class="logo-section">
           <h1 class="logo">RGS</h1>
-          <span class="tagline">Round Golf System</span>
+          <span class="tagline">Rykket's Golf Service</span>
         </div>
         
         <div class="user-section">
@@ -213,7 +213,7 @@ export default {
   background: white;
   border-bottom: 1px solid #e2e8f0;
   padding: 1rem 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header-content {
@@ -235,16 +235,13 @@ export default {
   font-size: 2rem;
   font-weight: 800;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1e293b;
 }
 
 .tagline {
   font-size: 0.9rem;
   color: #64748b;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .user-section {
@@ -263,7 +260,7 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   display: flex;
   align-items: center;
@@ -296,7 +293,7 @@ export default {
   background: #f1f5f9;
   color: #64748b;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
@@ -330,6 +327,7 @@ export default {
   font-size: 1.1rem;
   color: #64748b;
   margin: 0;
+  font-weight: 400;
 }
 
 .stats-grid {
@@ -342,8 +340,8 @@ export default {
 .stat-card {
   background: white;
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
@@ -352,15 +350,15 @@ export default {
 }
 
 .stat-card:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
 }
 
 .stat-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -393,24 +391,24 @@ export default {
 .action-card {
   background: white;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
   text-align: center;
   transition: all 0.2s ease;
 }
 
 .action-card:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transform: translateY(-1px);
 }
 
 .action-icon {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  color: #667eea;
+  background: #f1f5f9;
+  color: #2563eb;
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -433,21 +431,20 @@ export default {
 .action-button {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 6px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
 }
 
 .action-button.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2563eb;
   color: white;
 }
 
 .action-button.primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  background: #1d4ed8;
 }
 
 .action-button.secondary {
@@ -463,9 +460,9 @@ export default {
 
 .recent-activity {
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
 }
 
@@ -506,9 +503,26 @@ export default {
     text-align: center;
   }
   
-  .user-section {
+  .logo-section {
     flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .user-section {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
     gap: 1rem;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .logout-button {
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
   }
   
   .dashboard-main {
@@ -519,9 +533,143 @@ export default {
     font-size: 2rem;
   }
   
-  .stats-grid,
+  .welcome-subtitle {
+    font-size: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .stat-icon {
+    align-self: center;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
   .action-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .action-card {
+    padding: 1.5rem;
+  }
+  
+  .action-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1rem;
+  }
+  
+  .action-title {
+    font-size: 1.1rem;
+  }
+  
+  .action-description {
+    font-size: 0.9rem;
+  }
+  
+  .action-button {
+    padding: 1rem 1.5rem;
+    width: 100%;
+  }
+  
+  .recent-activity {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+  }
+  
+  .activity-placeholder {
+    padding: 2rem 1rem;
+  }
+  
+  .activity-placeholder h4 {
+    font-size: 1rem;
+  }
+  
+  .activity-placeholder p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0 0.5rem;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+  }
+  
+  .tagline {
+    font-size: 0.8rem;
+  }
+  
+  .user-section {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .logout-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .dashboard-main {
+    padding: 0.5rem;
+  }
+  
+  .welcome-section {
+    margin-bottom: 2rem;
+  }
+  
+  .welcome-title {
+    font-size: 1.75rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+  }
+  
+  .action-grid {
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  .action-card {
+    padding: 1.25rem;
+  }
+  
+  .recent-activity {
+    padding: 1.25rem;
+  }
+  
+  .activity-placeholder {
+    padding: 1.5rem 0.5rem;
   }
 }
 </style> 
