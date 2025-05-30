@@ -107,7 +107,7 @@ def create_user():
 def get_user(user_id):
     """Get a specific user"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         
         # Check if user is requesting their own data or is admin
         user = UserService.get_user_by_id(current_user_id, include_sensitive=True)
@@ -153,7 +153,7 @@ def get_user(user_id):
 def update_user(user_id):
     """Update a user"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         
         # Check if user is updating their own data or is admin
         current_user = UserService.get_user_by_id(current_user_id, include_sensitive=True)
@@ -272,7 +272,7 @@ def deactivate_user(user_id):
 def update_password(user_id):
     """Update user password"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         
         # Users can only change their own password
         if current_user_id != user_id:
@@ -322,7 +322,7 @@ def update_password(user_id):
 def get_user_statistics(user_id):
     """Get user statistics"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         
         # Check if user is requesting their own data or is admin
         current_user = UserService.get_user_by_id(current_user_id, include_sensitive=True)
@@ -399,7 +399,7 @@ def search_users():
 def get_current_user_profile():
     """Get current user's profile"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         user = UserService.get_user_by_id(current_user_id)
         
         if not user:
@@ -426,7 +426,7 @@ def get_current_user_profile():
 def update_current_user_profile():
     """Update current user's profile"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         
         # Validate request data
         user_data = user_update_schema.load(request.json)

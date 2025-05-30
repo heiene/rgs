@@ -4,40 +4,66 @@ This directory contains utility scripts for the RGS (Round Golf System) project.
 
 ## 📋 Available Scripts
 
-### 🧪 `run-tests.py` - Test Runner
-**Purpose:** Run the test suite with various options and configurations.
+### 🧪 `run-tests.py` - Advanced Test Runner
+**Purpose:** Comprehensive test runner with multiple options for different development workflows.
 
-**Usage:**
+**Basic Usage:**
 ```bash
 # Run all tests
 python scripts/run-tests.py
 
-# Run specific test module
-python scripts/run-tests.py -m test_auth
-python scripts/run-tests.py -m test_models
-
-# Run with coverage report
-python scripts/run-tests.py --coverage
-
-# Watch mode (auto-rerun on file changes)
-python scripts/run-tests.py --watch
-
-# Fast mode (skip slow tests)
-python scripts/run-tests.py --fast
-
-# Verbose output
+# Run all tests with verbose output
 python scripts/run-tests.py -v
 
-# Clean artifacts before running
-python scripts/run-tests.py --clean
+# Run with coverage report (HTML output in backend/htmlcov/)
+python scripts/run-tests.py --coverage
 ```
 
-**Features:**
-- 🎯 Module-specific testing
-- 📊 Coverage reporting with HTML output
-- 🔄 Watch mode for continuous testing
-- 🏃‍♂️ Fast mode for quick feedback
-- 🧹 Artifact cleanup
+**Module-Specific Testing:**
+```bash
+# Run specific test modules
+python scripts/run-tests.py -m test_auth         # Authentication tests only
+python scripts/run-tests.py -m test_models       # Database model tests only  
+python scripts/run-tests.py -m test_email_service # Email service tests only
+python scripts/run-tests.py -m test_golf_models  # Golf-specific model tests
+python scripts/run-tests.py -m test_app          # Basic app functionality tests
+```
+
+**Development Workflow Options:**
+```bash
+# Watch mode - auto-rerun tests when files change (great for TDD)
+python scripts/run-tests.py --watch
+
+# Fast mode - skip slow tests for quick feedback
+python scripts/run-tests.py --fast
+
+# Clean mode - remove test artifacts before running
+python scripts/run-tests.py --clean
+
+# Combine options
+python scripts/run-tests.py -m test_auth --watch --coverage
+```
+
+**Direct Pytest Access:**
+For more granular control, you can also use pytest directly:
+```bash
+cd backend
+
+# Run specific test class
+python -m pytest tests/test_auth.py::TestAuthLogin -v
+
+# Run single test method
+python -m pytest tests/test_auth.py::TestAuthLogin::test_login_success -v
+
+# Run tests matching pattern
+python -m pytest tests/ -k "login" -v
+
+# Stop on first failure
+python -m pytest tests/ -x
+
+# Run only failed tests from last run
+python -m pytest tests/ --lf
+```
 
 ---
 
@@ -49,220 +75,269 @@ python scripts/run-tests.py --clean
 # Create default admin and test users
 python scripts/create-admin-user.py
 
-# The script creates:
-# - admin@rgs.test (password: AdminPass123!)
-# - test@rgs.test (password: TestPass123!)
+# Creates:
+# - admin@rgs.test (password: AdminPass123!) - Admin privileges
+# - test@rgs.test (password: TestPass123!) - Regular user
 ```
 
-**Features:**
-- ✅ Creates admin user with full privileges
-- ✅ Creates test user for regular operations
-- 🔍 Checks for existing users to prevent duplicates
-- 📝 Provides detailed feedback with user IDs
-- 🔐 Uses secure password hashing
-
-**Requirements:**
-- Database must be running and migrated
-- Run from project root directory
+**When to Use:**
+- Setting up a new development environment
+- After resetting the database
+- When you need test users for manual API testing
 
 ---
 
-### 🌐 `api-test.py` - API Testing Tool
-**Purpose:** Interactive API testing and validation tool.
+### 🌐 `api-test.py` - Interactive API Testing
+**Purpose:** Interactive tool for testing API endpoints and workflows.
 
 **Usage:**
 ```bash
-# Interactive mode (recommended)
+# Interactive mode with menu system
 python scripts/api-test.py
 
 # Test specific functionality
-python scripts/api-test.py --mode auth        # Authentication tests
-python scripts/api-test.py --mode users       # User management tests
-python scripts/api-test.py --mode reset       # Password reset tests
-python scripts/api-test.py --mode all         # All tests
+python scripts/api-test.py --mode auth        # Authentication endpoints
+python scripts/api-test.py --mode users       # User management  
+python scripts/api-test.py --mode reset       # Password reset flow
+python scripts/api-test.py --mode all         # Run all automated tests
 
-# Use different API base URL
+# Use different API URL
 python scripts/api-test.py --url http://localhost:5000/api/v1
 ```
 
 **Features:**
-- 🔐 Authentication flow testing
-- 👥 User management operations
-- 🔄 Password reset functionality
-- 🎨 Interactive menu system
+- 🔐 Complete authentication flow testing
+- 👥 User registration and management
+- 🔄 Password reset functionality testing
+- 🎨 Interactive menu for manual testing
 - 📊 Detailed request/response logging
-- 🌍 Health check verification
-
-**Test Categories:**
-- **Authentication:** Login, register, token refresh
-- **Users:** Profile management, user operations
-- **Password Reset:** Forgot/reset password flow
-- **Interactive:** Manual API exploration
 
 ---
 
-### 🗄️ `dev-utils.sh` - Database Utilities
-**Purpose:** Database development and management utilities.
+### 🗄️ `dev-utils.sh` - Database & Development Utilities
+**Purpose:** Database management and development environment utilities.
 
-**Usage:**
+**Setup:**
 ```bash
-# Make executable (first time)
+# Make executable (first time only)
 chmod +x scripts/dev-utils.sh
-
-# Start PostgreSQL database
-./scripts/dev-utils.sh start
-
-# Stop PostgreSQL database  
-./scripts/dev-utils.sh stop
-
-# Reset database (drop and recreate)
-./scripts/dev-utils.sh reset
-
-# Run database migrations
-./scripts/dev-utils.sh migrate
-
-# Create new migration
-./scripts/dev-utils.sh migration "Add new field"
-
-# Show database status
-./scripts/dev-utils.sh status
-
-# Full development setup
-./scripts/dev-utils.sh setup
 ```
 
-**Features:**
-- 🚀 One-command database startup
-- 🔄 Database reset and migration
-- 📊 Status monitoring
-- 🏗️ Complete development setup
-- 🐳 Docker support (if configured)
+**Database Operations:**
+```bash
+./scripts/dev-utils.sh start      # Start PostgreSQL database
+./scripts/dev-utils.sh stop       # Stop PostgreSQL database  
+./scripts/dev-utils.sh restart    # Restart PostgreSQL
+./scripts/dev-utils.sh status     # Show database status
+```
+
+**Database Management:**
+```bash
+./scripts/dev-utils.sh reset      # Drop and recreate database (DESTRUCTIVE)
+./scripts/dev-utils.sh migrate    # Run pending migrations
+./scripts/dev-utils.sh migration "Description"  # Create new migration
+```
+
+**Development Setup:**
+```bash
+./scripts/dev-utils.sh setup      # Complete development environment setup
+```
 
 ---
 
-## 🚀 Quick Start Workflows
+## 🚀 Testing Workflows
 
-### **New Developer Setup**
+### **Quick Development Testing**
 ```bash
-# 1. Setup database and environment
-./scripts/dev-utils.sh setup
+# 1. Watch mode for immediate feedback during development
+python scripts/run-tests.py --watch
 
-# 2. Create test users
-python scripts/create-admin-user.py
+# 2. Test specific area you're working on
+python scripts/run-tests.py -m test_auth --watch
 
-# 3. Run tests to verify setup
-python scripts/run-tests.py
+# 3. Fast tests for quick validation
+python scripts/run-tests.py --fast
+```
 
-# 4. Test API functionality
+### **Comprehensive Testing**
+```bash
+# 1. Full test suite with coverage
+python scripts/run-tests.py --coverage
+
+# 2. Check all systems are working
+./scripts/dev-utils.sh status
+python scripts/api-test.py --mode all
+
+# 3. Manual API validation
+python scripts/api-test.py  # Interactive mode
+```
+
+### **New Feature Development**
+```bash
+# 1. Start with tests for the feature you're building
+python scripts/run-tests.py -m test_models --watch
+
+# 2. Use API tester to validate endpoints
+python scripts/api-test.py --mode auth
+
+# 3. Run full suite before committing
+python scripts/run-tests.py --coverage
+```
+
+### **Debugging Failed Tests**
+```bash
+# 1. Run specific failing test with verbose output
+python -m pytest tests/test_auth.py::TestAuthLogin::test_login_success -v -s
+
+# 2. Use coverage to see what's not tested
+python scripts/run-tests.py --coverage
+
+# 3. Test API manually to understand expected behavior
 python scripts/api-test.py
 ```
 
+---
+
+## 🔧 Test Organization
+
+### **Test Module Structure**
+```
+backend/tests/
+├── test_app.py           # Basic application functionality
+├── test_auth.py          # Authentication & authorization  
+├── test_models.py        # Core database models (User, Club, Theme)
+├── test_golf_models.py   # Golf-specific models (Course, Round, Score)
+├── test_email_service.py # Email functionality
+├── conftest.py          # Test fixtures and configuration
+└── pytest.ini          # Pytest settings
+```
+
+### **Test Categories**
+- **Unit Tests:** Individual model methods and service functions
+- **Integration Tests:** API endpoints and database relationships  
+- **Service Tests:** Business logic and external service integration
+- **End-to-End Tests:** Complete user workflows
+
+### **Available Test Fixtures**
+```python
+# In conftest.py - use these in your tests
+@pytest.fixture
+def app():              # Flask application instance
+def client(app):        # Test client for API calls
+def test_user(app):     # Regular user with known credentials
+def admin_user(app):    # Admin user for privilege testing
+def test_club(app):     # Sample golf club
+def test_theme(app):    # Sample theme
+def auth_headers():     # Authorization headers for API calls
+def admin_headers():    # Admin authorization headers
+```
+
+---
+
+## 🎯 Common Testing Commands
+
 ### **Daily Development**
 ```bash
-# Start database
-./scripts/dev-utils.sh start
+# Quick check everything works
+python scripts/run-tests.py --fast
 
-# Run tests in watch mode while developing
-python scripts/run-tests.py --watch
+# Work on specific feature with immediate feedback
+python scripts/run-tests.py -m test_auth --watch
 
-# Test API changes
-python scripts/api-test.py --mode auth
+# Test API changes manually
+python scripts/api-test.py
 ```
 
 ### **Before Committing**
 ```bash
-# Run full test suite with coverage
+# Full test suite
+python scripts/run-tests.py
+
+# Check coverage
 python scripts/run-tests.py --coverage
 
-# Verify API endpoints work
+# Validate API endpoints
 python scripts/api-test.py --mode all
 ```
 
----
+### **Setting Up New Environment**
+```bash
+# 1. Setup database and environment
+./scripts/dev-utils.sh setup
 
-## 📁 Directory Structure
+# 2. Create test users  
+python scripts/create-admin-user.py
 
+# 3. Verify everything works
+python scripts/run-tests.py
+python scripts/api-test.py --mode all
 ```
-scripts/
-├── README.md              # This documentation
-├── run-tests.py           # Test runner with advanced options
-├── create-admin-user.py   # User creation utility
-├── api-test.py            # API testing tool
-└── dev-utils.sh           # Database and development utilities
+
+### **Debugging Issues**
+```bash
+# Check what's not working
+./scripts/dev-utils.sh status
+
+# Reset if needed (DESTRUCTIVE)
+./scripts/dev-utils.sh reset
+python scripts/create-admin-user.py
+
+# Run specific tests with output
+python -m pytest tests/test_auth.py -v -s
 ```
-
----
-
-## 🔧 Requirements
-
-### **Python Scripts**
-- Python 3.11+
-- Flask application dependencies (see `backend/requirements.txt`)
-- Database running and migrated
-
-### **Shell Scripts** 
-- Bash shell
-- PostgreSQL installed
-- psql command available
 
 ---
 
 ## 🆘 Troubleshooting
 
-### **Common Issues**
+### **Common Issues & Solutions**
 
 **Database Connection Errors:**
 ```bash
-# Check if PostgreSQL is running
-./scripts/dev-utils.sh status
-
-# Start database if not running
-./scripts/dev-utils.sh start
-```
-
-**Migration Errors:**
-```bash
-# Reset database and run fresh migrations
-./scripts/dev-utils.sh reset
-./scripts/dev-utils.sh migrate
+./scripts/dev-utils.sh status    # Check if PostgreSQL is running
+./scripts/dev-utils.sh start     # Start if not running
 ```
 
 **Test Failures:**
 ```bash
-# Clean test artifacts
-python scripts/run-tests.py --clean
-
-# Run specific failing test module
-python scripts/run-tests.py -m test_auth -v
+python scripts/run-tests.py --clean  # Clean test artifacts
+./scripts/dev-utils.sh reset          # Reset database (if needed)
+python scripts/create-admin-user.py   # Recreate test users
 ```
 
-**API Test Connection Issues:**
+**API Connection Issues:**
 ```bash
-# Verify Flask server is running on correct port
+# Check Flask server is running
 curl http://127.0.0.1:5000/health
 
-# Check API health endpoint
+# Test API health
 python scripts/api-test.py --mode health
 ```
 
----
-
-## 🤝 Contributing
-
-When adding new scripts:
-
-1. **Follow naming convention:** `kebab-case.py` or `kebab-case.sh`
-2. **Add help documentation:** Use argparse for Python, help text for shell
-3. **Update this README:** Document the new script's purpose and usage
-4. **Include error handling:** Graceful failures with helpful error messages
-5. **Test thoroughly:** Verify script works in clean environment
+**Import or Module Errors:**
+```bash
+cd backend
+python -c "import app; print('App imports OK')"
+```
 
 ---
 
 ## 📝 Notes
 
-- All Python scripts should be run from the project root directory
-- Shell scripts are designed to work from any directory
-- Scripts use the backend virtual environment and configuration
-- Test scripts use SQLite in-memory database for speed
-- API scripts default to `http://127.0.0.1:5000/api/v1` 
+- **Test Database:** Tests use SQLite in-memory for speed (see `conftest.py`)
+- **Test Isolation:** Each test gets fresh database state
+- **Environment:** Tests use 'testing' config with faster password hashing
+- **Authentication:** Fixtures automatically handle JWT tokens
+- **Email:** Email sending disabled in tests (uses mocks)
+- **Order Independence:** Tests can run in any order
+
+---
+
+## 🎉 Next Steps
+
+1. **For New Developers:** Start with `./scripts/dev-utils.sh setup` and `python scripts/run-tests.py`
+2. **For Feature Development:** Use `--watch` mode for immediate feedback
+3. **For API Testing:** Use `python scripts/api-test.py` for manual validation
+4. **For Debugging:** Use verbose pytest commands with `-v -s` flags
+
+The testing infrastructure provides comprehensive coverage and fast feedback loops for confident development! 🚀 

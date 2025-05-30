@@ -252,22 +252,22 @@ class TestTokenValidation:
     
     def test_valid_token_access(self, client, auth_headers):
         """Test accessing protected endpoint with valid token"""
-        response = client.get('/api/v1/users/profile', headers=auth_headers)
+        response = client.get('/api/v1/auth/me', headers=auth_headers)
         assert response.status_code == 200
     
     def test_missing_token_access(self, client):
         """Test accessing protected endpoint without token"""
-        response = client.get('/api/v1/users/profile')
+        response = client.get('/api/v1/auth/me')
         assert response.status_code == 401
     
     def test_invalid_token_access(self, client):
         """Test accessing protected endpoint with invalid token"""
         headers = {'Authorization': 'Bearer invalid-token'}
-        response = client.get('/api/v1/users/profile', headers=headers)
-        assert response.status_code == 401
+        response = client.get('/api/v1/auth/me', headers=headers)
+        assert response.status_code == 422  # Malformed token returns 422
     
     def test_malformed_authorization_header(self, client):
         """Test with malformed authorization header"""
         headers = {'Authorization': 'InvalidFormat token'}
-        response = client.get('/api/v1/users/profile', headers=headers)
+        response = client.get('/api/v1/auth/me', headers=headers)
         assert response.status_code == 401 

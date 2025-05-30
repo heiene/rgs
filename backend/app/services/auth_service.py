@@ -113,7 +113,7 @@ class AuthService:
             User ID or None if not authenticated
         """
         try:
-            return get_jwt_identity()
+            return int(get_jwt_identity())
         except Exception:
             return None
     

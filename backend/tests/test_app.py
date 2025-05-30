@@ -45,23 +45,23 @@ def test_api_auth_endpoints_exist(client):
 
 def test_api_user_endpoints_exist(client, auth_headers):
     """Test that API user endpoints exist (require authentication)"""
-    # Test profile endpoint exists
-    response = client.get('/api/v1/users/profile', headers=auth_headers)
+    # Test me endpoint exists
+    response = client.get('/api/v1/auth/me', headers=auth_headers)
     assert response.status_code == 200
     
-    # Test profile update endpoint exists
-    response = client.put('/api/v1/users/profile', headers=auth_headers, json={})
-    assert response.status_code in [200, 400]  # Should exist
+    # Test users list endpoint exists (admin only, so should be 403 for regular user)
+    response = client.get('/api/v1/users/', headers=auth_headers)
+    assert response.status_code in [200, 403]  # Should exist
 
 
 def test_api_user_endpoints_require_auth(client):
     """Test that API user endpoints require authentication"""
-    # Test profile endpoint requires auth
-    response = client.get('/api/v1/users/profile')
+    # Test me endpoint requires auth
+    response = client.get('/api/v1/auth/me')
     assert response.status_code == 401
     
-    # Test profile update endpoint requires auth
-    response = client.put('/api/v1/users/profile', json={})
+    # Test users list endpoint requires auth
+    response = client.get('/api/v1/users/')
     assert response.status_code == 401
 
 

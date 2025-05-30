@@ -68,8 +68,8 @@ def login():
         UserService.update_last_login(user.id)
         
         # Create tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         return jsonify({
             'success': True,
@@ -107,13 +107,16 @@ def register():
         user_obj = User.query.get(user['id'])
         EmailService.send_welcome_email(user_obj)
         
+        # Get user data with admin field for registration response
+        user_with_admin = user_obj.to_dict(include_sensitive=True)
+        
         # Create access token for immediate login
-        access_token = create_access_token(identity=user['id'])
+        access_token = create_access_token(identity=str(user['id']))
         
         return jsonify({
             'success': True,
             'access_token': access_token,
-            'user': user,
+            'user': user_with_admin,
             'message': 'User registered successfully'
         }), 201
         
@@ -121,13 +124,15 @@ def register():
         return jsonify({
             'success': False,
             'error': 'Validation failed',
+            'message': 'Validation failed',
             'details': e.messages
         }), 400
     
     except ValueError as e:
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': str(e),
+            'message': str(e)
         }), 400
     
     except Exception as e:
@@ -164,7 +169,7 @@ def refresh():
 def get_current_user():
     """Get current user info"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         user = UserService.get_user_by_id(current_user_id)
         
         if not user:
@@ -198,7 +203,7 @@ def forgot_password():
         
         return jsonify({
             'success': True,
-            'message': 'If an account with that email exists, a password reset email has been sent'
+            'message': 'Password reset email sent'
         }), 200
         
     except ValidationError as e:
@@ -229,7 +234,8 @@ def reset_password():
         if not user:
             return jsonify({
                 'success': False,
-                'error': 'Invalid or expired reset token'
+                'error': 'Invalid or expired reset token',
+                'message': 'Invalid or expired token'
             }), 400
         
         # Update password
