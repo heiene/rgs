@@ -391,4 +391,71 @@ def search_users():
             'success': False,
             'error': 'Failed to search users',
             'message': str(e)
+        }), 500
+
+
+@user_bp.route('/profile', methods=['GET'])
+@token_required
+def get_current_user_profile():
+    """Get current user's profile"""
+    try:
+        current_user_id = get_jwt_identity()
+        user = UserService.get_user_by_id(current_user_id)
+        
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'data': user
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get user profile',
+            'message': str(e)
+        }), 500
+
+
+@user_bp.route('/profile', methods=['PUT'])
+@token_required
+def update_current_user_profile():
+    """Update current user's profile"""
+    try:
+        current_user_id = get_jwt_identity()
+        
+        # Validate request data
+        user_data = user_update_schema.load(request.json)
+        
+        # Update user via service
+        updated_user = UserService.update_user(current_user_id, user_data)
+        
+        return jsonify({
+            'success': True,
+            'data': updated_user,
+            'message': 'Profile updated successfully'
+        }), 200
+        
+    except ValidationError as e:
+        return jsonify({
+            'success': False,
+            'error': 'Validation failed',
+            'details': e.messages
+        }), 400
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to update profile',
+            'message': str(e)
         }), 500 

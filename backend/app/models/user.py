@@ -48,7 +48,7 @@ class User(db.Model):
     home_club = db.relationship('Club', back_populates='members')
     preferred_theme = db.relationship('Theme', back_populates='users')
     rounds = db.relationship('Round', back_populates='user', cascade='all, delete-orphan')
-    handicaps = db.relationship('Handicap', back_populates='user', cascade='all, delete-orphan')
+    handicaps = db.relationship('Handicap', foreign_keys='Handicap.user_id', back_populates='user', cascade='all, delete-orphan')
     created_handicaps = db.relationship('Handicap', foreign_keys='Handicap.created_by_id', back_populates='created_by')
 
     def __repr__(self):
@@ -71,7 +71,8 @@ class User(db.Model):
     def current_handicap(self):
         """Get user's current handicap"""
         from app.models.handicap import Handicap
-        current = self.handicaps.filter(
+        current = Handicap.query.filter(
+            Handicap.user_id == self.id,
             Handicap.end_date.is_(None)
         ).first()
         return current.handicap_value if current else None

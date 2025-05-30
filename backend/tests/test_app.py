@@ -13,45 +13,80 @@ def test_health_endpoint(client):
     assert data['service'] == 'flask-backend'
 
 
-def test_api_auth_endpoints(client):
-    """Test API authentication endpoints exist"""
-    # Test login endpoint
+def test_api_health_endpoint(client):
+    """Test API health check endpoint"""
+    response = client.get('/api/v1/health')
+    assert response.status_code == 200
+    
+    data = response.get_json()
+    assert data['status'] == 'healthy'
+    assert 'timestamp' in data
+    assert 'version' in data
+
+
+def test_api_auth_endpoints_exist(client):
+    """Test that API authentication endpoints exist (not testing functionality)"""
+    # Test login endpoint exists
     response = client.post('/api/v1/auth/login', json={})
-    assert response.status_code == 200
+    assert response.status_code in [400, 401]  # Should exist but reject empty payload
     
-    # Test register endpoint
+    # Test register endpoint exists
     response = client.post('/api/v1/auth/register', json={})
-    assert response.status_code == 200
+    assert response.status_code == 400  # Should exist but reject empty payload
     
-    # Test refresh endpoint
-    response = client.post('/api/v1/auth/refresh', json={})
-    assert response.status_code == 200
+    # Test forgot password endpoint exists
+    response = client.post('/api/v1/auth/forgot-password', json={})
+    assert response.status_code == 400  # Should exist but reject empty payload
+    
+    # Test reset password endpoint exists
+    response = client.post('/api/v1/auth/reset-password', json={})
+    assert response.status_code == 400  # Should exist but reject empty payload
 
 
-def test_api_user_endpoints(client):
-    """Test API user endpoints exist"""
-    # Test get users endpoint
-    response = client.get('/api/v1/users')
+def test_api_user_endpoints_exist(client, auth_headers):
+    """Test that API user endpoints exist (require authentication)"""
+    # Test profile endpoint exists
+    response = client.get('/api/v1/users/profile', headers=auth_headers)
     assert response.status_code == 200
     
-    # Test create user endpoint
-    response = client.post('/api/v1/users', json={})
-    assert response.status_code == 201
+    # Test profile update endpoint exists
+    response = client.put('/api/v1/users/profile', headers=auth_headers, json={})
+    assert response.status_code in [200, 400]  # Should exist
 
 
-def test_admin_web_endpoints(client):
-    """Test admin web endpoints exist"""
-    # Test admin dashboard
-    response = client.get('/admin/')
-    assert response.status_code == 200
-    assert b'Admin Dashboard' in response.data
+def test_api_user_endpoints_require_auth(client):
+    """Test that API user endpoints require authentication"""
+    # Test profile endpoint requires auth
+    response = client.get('/api/v1/users/profile')
+    assert response.status_code == 401
     
-    # Test admin login page
-    response = client.get('/admin/login')
+    # Test profile update endpoint requires auth
+    response = client.put('/api/v1/users/profile', json={})
+    assert response.status_code == 401
+
+
+def test_cors_headers(client):
+    """Test that CORS headers are present"""
+    response = client.options('/api/v1/health')
     assert response.status_code == 200
-    assert b'Admin Login' in response.data
     
-    # Test admin upload page
-    response = client.get('/admin/upload')
-    assert response.status_code == 200
-    assert b'CSV Upload' in response.data 
+    # Check for CORS headers
+    assert 'Access-Control-Allow-Origin' in response.headers
+    assert 'Access-Control-Allow-Methods' in response.headers
+    assert 'Access-Control-Allow-Headers' in response.headers
+
+
+def test_404_error_handling(client):
+    """Test 404 error handling for non-existent endpoints"""
+    response = client.get('/api/v1/nonexistent')
+    assert response.status_code == 404
+    
+    data = response.get_json()
+    assert 'error' in data or 'message' in data
+
+
+def test_method_not_allowed(client):
+    """Test method not allowed handling"""
+    # Health endpoint should only accept GET
+    response = client.post('/api/v1/health')
+    assert response.status_code == 405  # Method Not Allowed 

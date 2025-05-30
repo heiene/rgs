@@ -1,10 +1,21 @@
 """
 API v1 Blueprint
 """
-from flask import Blueprint
+from flask import Blueprint, jsonify
+from datetime import datetime
 
 # Create API v1 blueprint
 api_v1_bp = Blueprint('api_v1', __name__)
+
+# Health check endpoint for API
+@api_v1_bp.route('/health')
+def api_health_check():
+    return jsonify({
+        'status': 'healthy',
+        'service': 'rgs-api',
+        'version': '1.0.0',
+        'timestamp': datetime.utcnow().isoformat()
+    }), 200
 
 # Import and register route blueprints
 from .auth_routes import auth_bp

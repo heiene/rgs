@@ -58,15 +58,17 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
-    """Testing configuration"""
+    """Testing configuration."""
     TESTING = True
-    FLASK_RUN_PORT = int(os.environ.get('FLASK_RUN_PORT', 5001))  # Different port for tests
-    SQLALCHEMY_DATABASE_URI = (
-        os.environ.get('TEST_DATABASE_URL') or 
-        'postgresql://localhost/rgs_test'
-    )
     WTF_CSRF_ENABLED = False
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)  # Shorter for tests
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    # Use faster password hashing for tests
+    BCRYPT_LOG_ROUNDS = 4
+    # Disable email sending in tests
+    MAIL_SUPPRESS_SEND = True
+    # Use a simple secret for tests
+    SECRET_KEY = 'test-secret-key-for-testing'
+    JWT_SECRET_KEY = 'test-jwt-secret-key-for-testing'
 
 
 class ProductionConfig(Config):

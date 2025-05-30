@@ -2,7 +2,7 @@
 Authentication API routes
 """
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from marshmallow import Schema, fields, ValidationError, validate
 from app.models.user import User
 from app.services.user_service import UserService
@@ -67,12 +67,14 @@ def login():
         # Update last login
         UserService.update_last_login(user.id)
         
-        # Create access token
+        # Create tokens
         access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
         
         return jsonify({
             'success': True,
             'access_token': access_token,
+            'refresh_token': refresh_token,
             'user': user.to_dict()
         }), 200
         

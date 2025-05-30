@@ -29,7 +29,10 @@ def load_user(user_id):
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     """JWT user identity loader"""
-    return user.id
+    # Handle both User objects and integer IDs
+    if hasattr(user, 'id'):
+        return user.id
+    return user
 
 
 @jwt.user_lookup_loader

@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 from app import create_app
 from app.extensions import db
-from app.models.user import User
+from app.models import User  # Import from models package
 
 
 def create_admin_user():
