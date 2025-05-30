@@ -3,7 +3,7 @@ Flask application factory
 """
 from flask import Flask
 from flask_cors import CORS
-from app.extensions import db, ma, login_manager, migrate, jwt
+from app.extensions import db, ma, login_manager, migrate, jwt, mail
 from app.config import config
 
 
@@ -20,6 +20,7 @@ def create_app(config_name='development'):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    mail.init_app(app)
     
     # Initialize CORS
     CORS(app, resources={

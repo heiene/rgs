@@ -14,6 +14,10 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    # Flask server settings
+    FLASK_RUN_HOST = os.environ.get('FLASK_RUN_HOST', '127.0.0.1')
+    FLASK_RUN_PORT = int(os.environ.get('FLASK_RUN_PORT', 5000))
+    
     # JWT Configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
@@ -31,6 +35,17 @@ class Config:
         'pool_pre_ping': True,
         'pool_recycle': 300,
     }
+    
+    # Email configuration
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'false').lower() in ['true', 'on', '1']
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or MAIL_USERNAME
+    MAIL_MAX_EMAILS = int(os.environ.get('MAIL_MAX_EMAILS', 10))
+    MAIL_SUPPRESS_SEND = os.environ.get('MAIL_SUPPRESS_SEND', 'false').lower() in ['true', 'on', '1']
 
 
 class DevelopmentConfig(Config):
@@ -45,6 +60,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
+    FLASK_RUN_PORT = int(os.environ.get('FLASK_RUN_PORT', 5001))  # Different port for tests
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get('TEST_DATABASE_URL') or 
         'postgresql://localhost/rgs_test'
@@ -56,6 +72,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
+    FLASK_RUN_PORT = int(os.environ.get('PORT', 5000))  # Heroku uses PORT env var
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     
     # Production security settings

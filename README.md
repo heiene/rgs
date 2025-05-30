@@ -41,77 +41,106 @@ rgs/
 └── docs/                     # Documentation
 ```
 
-## 🚀 Quick Start
+## 🚀 Manual Setup (Complete Instructions)
 
 ### Prerequisites
 - Python 3.11+ with conda/pip
 - Node.js 18+
-- PostgreSQL (installed via Homebrew recommended)
+- PostgreSQL (install via Homebrew: `brew install postgresql`)
 
-### One-Command Setup
+### 1. Database Setup
 ```bash
-# Make the script executable
-chmod +x scripts/dev-utils.sh
+# Start PostgreSQL service
+brew services start postgresql
 
-# Complete project setup (first time only)
-./scripts/dev-utils.sh setup
+# Create development and test databases
+createdb rgs_dev
+createdb rgs_test
 ```
 
-This will:
-- ✅ Check/create environment files (.env)
-- ✅ Install Python and Node.js dependencies
-- ✅ Start PostgreSQL
-- ✅ Create databases (rgs_dev, rgs_test)
-- ✅ Initialize and run database migrations
-
-### Start Development Servers
+### 2. Backend Setup
 ```bash
-# Start both backend and frontend servers
-./scripts/dev-utils.sh serve
+cd backend
+
+# Install the backend package in development mode
+pip install -e .
+
+# Your .env file should already exist with configuration like:
+# FLASK_CONFIG=development
+# FLASK_APP=run.py
+# FLASK_DEBUG=True
+# SECRET_KEY=your-secret-key
+# DEV_DATABASE_URL=postgresql://localhost/rgs_dev
+# TEST_DATABASE_URL=postgresql://localhost/rgs_test
+
+# Initialize database migrations
+flask db init
+
+# Create initial migration
+flask db migrate -m "Initial migration"
+
+# Apply migrations to database
+flask db upgrade
+
+# Run tests to verify setup
+pytest tests/
+
+# Start Flask development server
+flask run
 ```
 
-Access your application:
+### 3. Frontend Setup
+```bash
+cd frontend
+
+# Install Node.js dependencies
+npm install
+
+# Create .env file (if it doesn't exist)
+cat > .env << EOF
+VITE_API_BASE_URL=http://localhost:5000
+VITE_API_TIMEOUT=10000
+VITE_APP_TITLE=RGS - Vue Flask App
+VITE_ENABLE_DEBUG=true
+EOF
+
+# Start Vue development server
+npm run dev
+```
+
+### 4. Access Your Application
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000
 - **Admin Interface**: http://localhost:5000/admin
 - **Health Check**: http://localhost:5000/health
 
-## 🛠️ Development Utilities
+## 🛠️ Development Utilities (Simplified)
 
-The `scripts/dev-utils.sh` script provides comprehensive development environment management:
+For easier development workflow, use the simplified `scripts/dev-utils.sh` script:
+
+### Make Script Executable
+```bash
+chmod +x scripts/dev-utils.sh
+```
 
 ### Available Commands
 
-#### `setup` - Complete Project Setup
-```bash
-./scripts/dev-utils.sh setup
-```
-**First-time setup command that:**
-- Checks for `.env` files (creates if missing)
-- Installs all dependencies (Python + Node.js)
-- Starts PostgreSQL service
-- Creates development and test databases
-- Initializes database migrations
-- Sets up the complete development environment
-
-#### `serve` - Start Development Servers
-```bash
-./scripts/dev-utils.sh serve
-```
-**Starts both backend and frontend servers:**
-- Flask backend on http://localhost:5000
-- Vue frontend on http://localhost:3000
-- Press `Ctrl+C` to stop both servers
-
-#### `start` - Start Infrastructure
+#### `start` - Start PostgreSQL
 ```bash
 ./scripts/dev-utils.sh start
 ```
-**Starts PostgreSQL and sets up database:**
+**What it does:**
 - Starts PostgreSQL service via Homebrew
-- Creates databases if they don't exist
-- Runs database migrations
-- Prepares environment for development
+- Shows instructions for manually starting Flask and Vue
+
+#### `status` - Check Environment Status
+```bash
+./scripts/dev-utils.sh status
+```
+**Shows status of:**
+- PostgreSQL service
+- Flask backend server (if running)
+- Vue frontend server (if running)
 
 #### `stop` - Stop Services
 ```bash
@@ -121,93 +150,27 @@ The `scripts/dev-utils.sh` script provides comprehensive development environment
 # Stop servers AND PostgreSQL
 ./scripts/dev-utils.sh stop --with-db
 ```
+**What it does:**
+- Stops Flask backend (if running)
+- Stops Vue frontend (if running)
+- Optionally stops PostgreSQL with `--with-db` flag
 
-#### `status` - Check Environment Status
+### Simple Daily Workflow
 ```bash
+# 1. Start PostgreSQL
+./scripts/dev-utils.sh start
+
+# 2. Check what's running
 ./scripts/dev-utils.sh status
-```
-**Shows status of:**
-- PostgreSQL service
-- Flask backend server
-- Vue frontend server
-- Database existence
 
-#### `test` - Run Test Suite
-```bash
-./scripts/dev-utils.sh test
-```
-**Runs all tests:**
-- Backend tests with coverage report
-- Frontend tests (if configured)
-- Generates HTML coverage report
+# 3. Start backend (in one terminal)
+cd backend && flask run
 
-#### `install` - Install Dependencies
-```bash
-./scripts/dev-utils.sh install
-```
-**Installs:**
-- Python packages from `backend/requirements.txt`
-- Node.js packages from `frontend/package.json`
+# 4. Start frontend (in another terminal)
+cd frontend && npm run dev
 
-#### `db-setup` - Database Management
-```bash
-./scripts/dev-utils.sh db-setup
-```
-**Database operations:**
-- Creates development and test databases
-- Initializes Flask-Migrate if needed
-- Runs database migrations
-
-## 📋 Manual Development Workflow
-
-If you prefer manual control over the development environment:
-
-### Backend Setup
-```bash
-cd backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Environment file should already exist as .env
-# Edit .env with your database credentials if needed
-
-# Initialize database
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
-
-# Run tests
-pytest --cov=app
-
-# Start development server
-flask run
-```
-
-### Frontend Setup
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Environment file should already exist as .env
-
-# Start development server
-npm run dev
-
-# Run tests
-npm run test
-```
-
-### Database Setup
-```bash
-# Start PostgreSQL
-brew services start postgresql
-
-# Create databases
-createdb rgs_dev
-createdb rgs_test
+# 5. When done, stop everything
+./scripts/dev-utils.sh stop --with-db
 ```
 
 ## 🧪 Testing
@@ -217,16 +180,13 @@ createdb rgs_test
 cd backend
 
 # Run all tests
-pytest
+pytest tests/
 
 # Run with coverage
-pytest --cov=app --cov-report=html
+pytest tests/ --cov=app --cov-report=html
 
 # Run specific test file
 pytest tests/test_app.py -v
-
-# Run tests in watch mode
-pytest-watch
 ```
 
 ### Frontend Testing
@@ -238,16 +198,11 @@ npm run test
 
 # Run tests in watch mode
 npm run test:watch
-
-# Run tests with UI
-npm run test:ui
 ```
 
 ## 🔧 Configuration
 
-### Environment Variables
-
-#### Backend (.env)
+### Backend Environment Variables (.env)
 ```bash
 # Flask Configuration
 FLASK_CONFIG=development
@@ -256,16 +211,19 @@ FLASK_DEBUG=True
 SECRET_KEY=your-secret-key-here
 JWT_SECRET_KEY=your-jwt-secret-key-here
 
-# Database
+# Database URLs
 DEV_DATABASE_URL=postgresql://localhost/rgs_dev
 TEST_DATABASE_URL=postgresql://localhost/rgs_test
 
-# Security
+# Optional: Additional settings
 JWT_ACCESS_TOKEN_EXPIRES=3600
 JWT_REFRESH_TOKEN_EXPIRES=2592000
+FLASK_RUN_HOST=127.0.0.1
+FLASK_RUN_PORT=5000
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
-#### Frontend (.env)
+### Frontend Environment Variables (.env)
 ```bash
 # API Configuration
 VITE_API_BASE_URL=http://localhost:5000
@@ -274,24 +232,6 @@ VITE_API_TIMEOUT=10000
 # App Settings
 VITE_APP_TITLE=RGS - Vue Flask App
 VITE_ENABLE_DEBUG=true
-```
-
-## 🐳 Docker Support (Optional)
-
-Docker configuration is included but not required for development:
-
-```bash
-# Start everything with Docker
-docker-compose up --build
-
-# Start only PostgreSQL with Docker
-docker run -d \
-  --name rgs-postgres \
-  -e POSTGRES_DB=rgs_dev \
-  -e POSTGRES_USER=rgs_user \
-  -e POSTGRES_PASSWORD=rgs_password \
-  -p 5432:5432 \
-  postgres:15-alpine
 ```
 
 ## 📚 API Documentation
@@ -335,58 +275,74 @@ GET /admin/upload     # CSV upload
 # Start PostgreSQL
 brew services start postgresql
 
-# Check PostgreSQL logs
+# Check PostgreSQL installation
 brew services list | grep postgresql
 ```
 
 #### Port Already in Use
 ```bash
-# Check what's using port 5000
+# Check what's using port 5000 (Flask)
 lsof -i :5000
 
-# Check what's using port 3000
+# Check what's using port 3000 (Vue)
 lsof -i :3000
 
-# Kill process on port
+# Kill process on specific port
 kill $(lsof -ti:5000)
 ```
 
-#### Database Migration Issues
+#### Database Issues
+```bash
+# Check if databases exist
+psql -l | grep rgs
+
+# Recreate databases if needed
+dropdb rgs_dev && createdb rgs_dev
+dropdb rgs_test && createdb rgs_test
+```
+
+#### Migration Issues
 ```bash
 # Reset migrations (development only)
-rm -rf backend/migrations
 cd backend
+rm -rf migrations
 flask db init
 flask db migrate -m "Initial migration"
 flask db upgrade
 ```
 
-#### Dependencies Issues
-```bash
-# Reinstall backend dependencies
-cd backend
-pip install -r requirements.txt --force-reinstall
+## 🐳 Docker Support (Optional)
 
-# Reinstall frontend dependencies
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
+Docker configuration is included but not required for development:
+
+```bash
+# Start everything with Docker
+docker-compose up --build
+
+# Start only PostgreSQL with Docker
+docker run -d \
+  --name rgs-postgres \
+  -e POSTGRES_DB=rgs_dev \
+  -e POSTGRES_USER=rgs_user \
+  -e POSTGRES_PASSWORD=rgs_password \
+  -p 5432:5432 \
+  postgres:15-alpine
 ```
 
 ## 🤝 Development Workflow
-
-### Recommended Development Flow
-1. **First time**: `./scripts/dev-utils.sh setup`
-2. **Daily development**: `./scripts/dev-utils.sh serve`
-3. **Check status**: `./scripts/dev-utils.sh status`
-4. **Run tests**: `./scripts/dev-utils.sh test`
-5. **Stop everything**: `./scripts/dev-utils.sh stop`
 
 ### Git Workflow
 - Feature branches for all changes
 - Descriptive commit messages
 - Run tests before committing
 - Pull request reviews required
+
+### Recommended Daily Flow
+1. `./scripts/dev-utils.sh start` - Start PostgreSQL
+2. `cd backend && flask run` - Start backend
+3. `cd frontend && npm run dev` - Start frontend
+4. Develop and test
+5. `./scripts/dev-utils.sh stop --with-db` - Stop everything
 
 ## 📖 Next Steps
 
