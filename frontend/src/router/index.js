@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import Welcome from '@/views/Welcome.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import Profile from '@/views/Profile.vue'
 import AdminDashboard from '@/views/AdminDashboard.vue'
 
 const routes = [
@@ -18,11 +19,42 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/admin',
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin-dashboard',
     name: 'AdminDashboard',
     component: AdminDashboard,
     meta: { requiresAuth: true, requiresAdmin: true }
   }
+  // Admin routes (commented out until components are created)
+  // {
+  //   path: '/admin/users',
+  //   name: 'AdminUsers',
+  //   component: () => import('@/views/admin/AdminUsers.vue'),
+  //   meta: { requiresAuth: true, requiresAdmin: true }
+  // },
+  // {
+  //   path: '/admin/courses',
+  //   name: 'AdminCourses', 
+  //   component: () => import('@/views/admin/AdminCourses.vue'),
+  //   meta: { requiresAuth: true, requiresAdmin: true }
+  // },
+  // {
+  //   path: '/admin/clubs',
+  //   name: 'AdminClubs',
+  //   component: () => import('@/views/admin/AdminClubs.vue'),
+  //   meta: { requiresAuth: true, requiresAdmin: true }
+  // },
+  // {
+  //   path: '/admin/tee-sets',
+  //   name: 'AdminTeeSets',
+  //   component: () => import('@/views/admin/AdminTeeSets.vue'),
+  //   meta: { requiresAuth: true, requiresAdmin: true }
+  // }
 ]
 
 const router = createRouter({
@@ -30,37 +62,33 @@ const router = createRouter({
   routes
 })
 
-// Navigation guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // Initialize auth if not already done
+  // Initialize auth if needed
   if (authStore.token && !authStore.user) {
     authStore.initializeAuth()
   }
   
-  // Check if route requires authentication
-  if (to.meta.requiresAuth) {
-    if (!authStore.isLoggedIn) {
-      next({ name: 'Welcome' })
-      return
-    }
+  const isAuthenticated = authStore.isAuthenticated
+  const user = authStore.currentUser
+  
+  // Check authentication requirements
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/')
+    return
   }
   
-  // Check if route requires admin
-  if (to.meta.requiresAdmin) {
-    if (!authStore.user?.is_admin) {
-      next({ name: 'Dashboard' })
-      return
-    }
+  // Check guest-only routes
+  if (to.meta.requiresGuest && isAuthenticated) {
+    next('/dashboard')
+    return
   }
   
-  // Check if route requires guest (not authenticated)
-  if (to.meta.requiresGuest) {
-    if (authStore.isLoggedIn) {
-      next({ name: 'Dashboard' })
-      return
-    }
+  // Check admin requirements
+  if (to.meta.requiresAdmin && (!user || !user.is_admin)) {
+    next('/dashboard')
+    return
   }
   
   next()

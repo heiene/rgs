@@ -35,11 +35,4 @@ class HandicapResponseSchema(Schema):
     user_id = fields.Int()
     created_by_id = fields.Int()
     created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
-
-
-class InitialHandicapSchema(Schema):
-    """Schema for setting initial handicap"""
-    user_id = fields.Int(required=True)
-    handicap_value = fields.Float(required=True, validate=validate.Range(min=-5, max=54))
-    reason = fields.Str(missing="Initial handicap") 
+    updated_at = fields.DateTime(dump_only=True) 

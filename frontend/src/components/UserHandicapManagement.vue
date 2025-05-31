@@ -15,18 +15,10 @@
         <h3>Current Handicap</h3>
         <div class="actions">
           <button 
-            v-if="!currentHandicap" 
-            @click="showSetInitialModal = true" 
+            @click="showHandicapModal = true" 
             class="btn-primary"
           >
-            Set Initial Handicap
-          </button>
-          <button 
-            v-else 
-            @click="showUpdateModal = true" 
-            class="btn-secondary"
-          >
-            Update Handicap
+            {{ currentHandicap ? 'Update Handicap' : 'Set Initial Handicap' }}
           </button>
         </div>
       </div>
@@ -59,59 +51,69 @@
 
     <!-- Handicap History -->
     <div class="handicap-history">
-      <div class="history-header">
+      <div class="history-header" @click="toggleHistoryExpanded">
         <h3>📊 Handicap History</h3>
-        <button @click="loadHandicapHistory" class="refresh-btn" title="Refresh">
-          🔄
-        </button>
-      </div>
-
-      <div v-if="loadingHistory" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading history...</p>
-      </div>
-
-      <div v-else-if="handicapHistory.length > 0" class="history-list">
-        <div 
-          v-for="handicap in handicapHistory" 
-          :key="handicap.id"
-          :class="['history-item', { current: handicap.is_current }]"
-        >
-          <div class="handicap-value">{{ handicap.handicap_value }}</div>
-          <div class="handicap-period">
-            <div class="period-dates">
-              {{ formatDate(handicap.start_date) }}
-              <span v-if="handicap.end_date"> - {{ formatDate(handicap.end_date) }}</span>
-              <span v-else class="current-indicator"> - Current</span>
-            </div>
-            <div class="period-duration">{{ handicap.days_active }} days</div>
-          </div>
-          <div class="handicap-reason">
-            {{ handicap.reason || 'No reason provided' }}
-          </div>
+        <div class="header-actions">
+          <button @click.stop="loadHandicapHistory" class="refresh-btn" title="Refresh">
+            🔄
+          </button>
+          <span class="expand-icon" :class="{ expanded: isHistoryExpanded }">▼</span>
         </div>
       </div>
 
-      <div v-else class="empty-history">
-        <div class="empty-icon">📈</div>
-        <h4>No History Available</h4>
-        <p>Your handicap history will appear here as you update your handicap.</p>
+      <div class="history-content" :class="{ expanded: isHistoryExpanded }">
+        <div class="history-content-inner">
+          <div v-if="loadingHistory" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading history...</p>
+          </div>
+
+          <div v-else-if="handicapHistory.length > 0" class="history-list">
+            <div 
+              v-for="handicap in handicapHistory" 
+              :key="handicap.id"
+              :class="['history-item', { current: handicap.is_current }]"
+            >
+              <div class="handicap-value">{{ handicap.handicap_value }}</div>
+              <div class="handicap-period">
+                <div class="period-dates">
+                  {{ formatDate(handicap.start_date) }}
+                  <span v-if="handicap.end_date"> - {{ formatDate(handicap.end_date) }}</span>
+                  <span v-else class="current-indicator"> - Current</span>
+                </div>
+                <div class="period-duration">{{ handicap.days_active }} days</div>
+              </div>
+              <div class="handicap-reason">
+                {{ handicap.reason || 'No reason provided' }}
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="empty-history">
+            <div class="empty-icon">📈</div>
+            <h4>No History Available</h4>
+            <p>Your handicap history will appear here as you update your handicap.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Set Initial Handicap Modal -->
-    <div v-if="showSetInitialModal" class="modal-overlay" @click="closeInitialModal">
+    <!-- Set/Update Handicap Modal -->
+    <div v-if="showHandicapModal" class="modal-overlay" @click="closeHandicapModal">
       <div class="modal" @click.stop>
-        <h3>⛳ Set Initial Handicap</h3>
+        <div class="modal-header">
+          <h3>⛳ Set/Update Handicap</h3>
+          <button class="modal-close" @click="closeHandicapModal">&times;</button>
+        </div>
         <p class="modal-description">
           Enter your current handicap index. This will be used as your starting point for tracking improvements.
         </p>
         
-        <form @submit.prevent="setInitialHandicap" class="handicap-form">
+        <form @submit.prevent="setHandicap" class="handicap-form">
           <div class="form-group">
             <label>Handicap Value:</label>
             <input 
-              v-model.number="initialHandicapForm.handicap_value" 
+              v-model.number="handicapForm.handicap_value" 
               type="number" 
               step="0.1" 
               min="-5" 
@@ -124,53 +126,9 @@
           </div>
 
           <div class="form-group">
-            <label>Reason (Optional):</label>
-            <textarea 
-              v-model="initialHandicapForm.reason" 
-              placeholder="e.g., Official handicap from golf club"
-              class="form-input"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" @click="closeInitialModal" class="btn-secondary">Cancel</button>
-            <button type="submit" :disabled="settingHandicap" class="btn-primary">
-              {{ settingHandicap ? 'Setting...' : 'Set Initial Handicap' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Update Handicap Modal -->
-    <div v-if="showUpdateModal" class="modal-overlay" @click="closeUpdateModal">
-      <div class="modal" @click.stop>
-        <h3>📈 Update Handicap</h3>
-        <p class="modal-description">
-          Update your handicap to reflect recent improvements or changes.
-        </p>
-        
-        <form @submit.prevent="updateHandicap" class="handicap-form">
-          <div class="form-group">
-            <label>New Handicap Value:</label>
-            <input 
-              v-model.number="updateHandicapForm.handicap_value" 
-              type="number" 
-              step="0.1" 
-              min="-5" 
-              max="54" 
-              required 
-              class="form-input"
-              placeholder="e.g., 14.2"
-            >
-            <small class="form-help">Current: {{ currentHandicap?.handicap_value }}</small>
-          </div>
-
-          <div class="form-group">
             <label>Effective Date:</label>
             <input 
-              v-model="updateHandicapForm.start_date" 
+              v-model="handicapForm.start_date" 
               type="date" 
               required 
               class="form-input"
@@ -178,20 +136,20 @@
           </div>
 
           <div class="form-group">
-            <label>Reason for Change:</label>
+            <label>Reason for Change (Optional):</label>
             <textarea 
-              v-model="updateHandicapForm.reason" 
-              placeholder="e.g., Recent tournament results, improved short game"
+              v-model="handicapForm.reason" 
+              placeholder="e.g., Recent tournament results, improved short game (leave blank for default)"
               class="form-input"
               rows="3"
-              required
             ></textarea>
+            <small class="form-help">If left blank, will default to 'Handicap updated by [Your Name]'</small>
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeUpdateModal" class="btn-secondary">Cancel</button>
-            <button type="submit" :disabled="updatingHandicap" class="btn-primary">
-              {{ updatingHandicap ? 'Updating...' : 'Update Handicap' }}
+            <button type="button" @click="closeHandicapModal" class="btn-secondary">Cancel</button>
+            <button type="submit" :disabled="settingHandicap" class="btn-primary">
+              {{ settingHandicap ? 'Setting...' : 'Set/Update Handicap' }}
             </button>
           </div>
         </form>
@@ -214,17 +172,11 @@ export default {
     const currentHandicap = ref(null)
     const handicapHistory = ref([])
     const loadingHistory = ref(false)
-    const showSetInitialModal = ref(false)
-    const showUpdateModal = ref(false)
+    const showHandicapModal = ref(false)
     const settingHandicap = ref(false)
-    const updatingHandicap = ref(false)
+    const isHistoryExpanded = ref(false)
 
-    const initialHandicapForm = reactive({
-      handicap_value: '',
-      reason: 'Initial handicap setting'
-    })
-
-    const updateHandicapForm = reactive({
+    const handicapForm = reactive({
       handicap_value: '',
       start_date: new Date().toISOString().split('T')[0],
       reason: ''
@@ -263,62 +215,57 @@ export default {
       }
     }
 
-    const setInitialHandicap = async () => {
+    const setHandicap = async () => {
       settingHandicap.value = true
       try {
-        const response = await axios.post(`${API_BASE_URL}/handicaps/my-handicaps/initial`, {
-          handicap_value: initialHandicapForm.handicap_value,
-          reason: initialHandicapForm.reason
-        }, {
+        const payload = {
+          user_id: parseInt(authStore.currentUser?.id),
+          handicap_value: parseFloat(handicapForm.handicap_value),
+          start_date: handicapForm.start_date,
+          reason: handicapForm.reason,
+          created_by_id: parseInt(authStore.currentUser?.id)
+        }
+
+        console.log('Sending handicap payload:', payload)
+
+        const response = await axios.post(`${API_BASE_URL}/handicaps/my-handicaps`, payload, {
           headers: { Authorization: `Bearer ${authStore.token}` }
         })
 
         if (response.data.success) {
           currentHandicap.value = response.data.data
-          closeInitialModal()
+          closeHandicapModal()
           loadHandicapHistory()
         }
       } catch (error) {
-        console.error('Failed to set initial handicap:', error)
+        console.error('Failed to set handicap:', error)
+        console.error('Error response:', error.response?.data)
+        
+        let errorMessage = 'Failed to set handicap'
+        if (error.response?.data?.details) {
+          // Handle validation errors
+          const details = error.response.data.details
+          const fieldErrors = Object.entries(details).map(([field, errors]) => 
+            `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`
+          ).join('; ')
+          errorMessage = `Validation errors: ${fieldErrors}`
+        } else if (error.response?.data?.error) {
+          errorMessage = error.response.data.error
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message
+        }
+        
+        alert(errorMessage) // Temporary - you could add a proper notification system
       } finally {
         settingHandicap.value = false
       }
     }
 
-    const updateHandicap = async () => {
-      updatingHandicap.value = true
-      try {
-        const response = await axios.post(`${API_BASE_URL}/handicaps/my-handicaps`, {
-          handicap_value: updateHandicapForm.handicap_value,
-          start_date: updateHandicapForm.start_date,
-          reason: updateHandicapForm.reason
-        }, {
-          headers: { Authorization: `Bearer ${authStore.token}` }
-        })
-
-        if (response.data.success) {
-          currentHandicap.value = response.data.data
-          closeUpdateModal()
-          loadHandicapHistory()
-        }
-      } catch (error) {
-        console.error('Failed to update handicap:', error)
-      } finally {
-        updatingHandicap.value = false
-      }
-    }
-
-    const closeInitialModal = () => {
-      showSetInitialModal.value = false
-      initialHandicapForm.handicap_value = ''
-      initialHandicapForm.reason = 'Initial handicap setting'
-    }
-
-    const closeUpdateModal = () => {
-      showUpdateModal.value = false
-      updateHandicapForm.handicap_value = ''
-      updateHandicapForm.start_date = new Date().toISOString().split('T')[0]
-      updateHandicapForm.reason = ''
+    const closeHandicapModal = () => {
+      showHandicapModal.value = false
+      handicapForm.handicap_value = ''
+      handicapForm.start_date = new Date().toISOString().split('T')[0]
+      handicapForm.reason = ''
     }
 
     const formatDate = (dateString) => {
@@ -327,6 +274,10 @@ export default {
         month: 'long',
         day: 'numeric'
       })
+    }
+
+    const toggleHistoryExpanded = () => {
+      isHistoryExpanded.value = !isHistoryExpanded.value
     }
 
     onMounted(() => {
@@ -338,18 +289,15 @@ export default {
       currentHandicap,
       handicapHistory,
       loadingHistory,
-      showSetInitialModal,
-      showUpdateModal,
+      showHandicapModal,
       settingHandicap,
-      updatingHandicap,
-      initialHandicapForm,
-      updateHandicapForm,
+      handicapForm,
       loadHandicapHistory,
-      setInitialHandicap,
-      updateHandicap,
-      closeInitialModal,
-      closeUpdateModal,
-      formatDate
+      setHandicap,
+      closeHandicapModal,
+      formatDate,
+      isHistoryExpanded,
+      toggleHistoryExpanded
     }
   }
 }
@@ -385,9 +333,9 @@ export default {
   min-width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
   color: white;
-  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
 .current-handicap-display .handicap-value {
@@ -489,12 +437,19 @@ export default {
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #f1f5f9;
   background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.history-header:hover {
+  background: #f1f5f9;
 }
 
 .history-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: #1e293b;
+  user-select: none;
 }
 
 .refresh-btn {
@@ -511,6 +466,37 @@ export default {
   background: #e2e8f0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-icon {
+  transition: transform 0.2s ease;
+  user-select: none;
+  color: #64748b;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.history-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: white;
+}
+
+.history-content.expanded {
+  max-height: 1000px;
+}
+
+.history-content-inner {
+  padding: 1.5rem 2rem;
+}
+
 .loading-state {
   text-align: center;
   padding: 3rem 2rem;
@@ -520,7 +506,7 @@ export default {
   width: 32px;
   height: 32px;
   border: 3px solid #e2e8f0;
-  border-top: 3px solid #2563eb;
+  border-top: 3px solid var(--theme-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -532,7 +518,6 @@ export default {
 }
 
 .history-list {
-  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -555,14 +540,14 @@ export default {
 }
 
 .history-item.current {
-  background: #f0fdf4;
-  border-color: #059669;
+  background: #eff6ff;
+  border-color: var(--theme-primary);
 }
 
 .history-item .handicap-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #059669;
+  color: var(--theme-primary);
   min-width: 80px;
 }
 
@@ -578,7 +563,7 @@ export default {
 }
 
 .current-indicator {
-  color: #059669;
+  color: var(--theme-primary);
   font-weight: 600;
 }
 
@@ -625,12 +610,12 @@ export default {
 }
 
 .btn-primary {
-  background: #059669;
+  background: var(--theme-primary);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #047857;
+  background: var(--theme-primary-dark);
   transform: translateY(-1px);
 }
 
@@ -659,31 +644,67 @@ export default {
 
 .modal {
   background: white;
-  padding: 2rem;
+  padding: 0;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.modal h3 {
-  margin: 0 0 0.5rem 0;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.modal-header h3 {
+  margin: 0;
   color: #1e293b;
   font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #e2e8f0;
+  color: #374151;
 }
 
 .modal-description {
   margin: 0 0 2rem 0;
   color: #64748b;
   line-height: 1.6;
+  padding: 0 2rem;
 }
 
 .handicap-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding: 0 2rem 2rem;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .form-group {
@@ -707,7 +728,7 @@ export default {
 
 .form-input:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--theme-primary);
 }
 
 .form-help {
@@ -768,4 +789,4 @@ export default {
     max-width: none;
   }
 }
-</style> 
+</style>

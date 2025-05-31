@@ -1,388 +1,194 @@
 <template>
-  <div class="dashboard-container">
-    <header class="dashboard-header">
-      <div class="header-content">
-        <div class="logo-section">
-          <h1 class="logo">RGS</h1>
-          <span class="tagline">Rykket's Golf Service</span>
-        </div>
-        
-        <div class="user-section">
-          <div class="user-info">
-            <div class="user-avatar">
-              {{ userInitials }}
-            </div>
-            <div class="user-details">
-              <span class="user-name">{{ fullName }}</span>
-              <span class="user-email">{{ authStore.currentUser?.email }}</span>
-            </div>
-          </div>
-          
-          <button @click="handleLogout" class="logout-button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16,17 21,12 16,7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            Logout
-          </button>
-        </div>
-      </div>
-    </header>
+  <AppLayout>
+    <div class="welcome-section">
+      <h2 class="welcome-title">Welcome back, {{ firstName }}!</h2>
+      <p class="welcome-subtitle">Ready to manage your golf rounds?</p>
+    </div>
     
-    <main class="dashboard-main">
-      <div class="welcome-section">
-        <h2 class="welcome-title">Welcome back, {{ firstName }}!</h2>
-        <p class="welcome-subtitle">Ready to manage your golf rounds?</p>
-        
-        <!-- Admin Navigation -->
-        <div v-if="authStore.currentUser?.is_admin" class="admin-nav">
-          <router-link to="/admin" class="admin-link">
-            🛠️ Admin Dashboard
-          </router-link>
-        </div>
-      </div>
-
-      <!-- Handicap Management Section -->
-      <div class="handicap-section">
-        <UserHandicapManagement />
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 6v6l4 2"></path>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-number">0</h3>
-            <p class="stat-label">Rounds Played</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-number">--</h3>
-            <p class="stat-label">Average Score</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-number">0</h3>
-            <p class="stat-label">Playing Partners</p>
-          </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
-            </svg>
-          </div>
-          <div class="stat-content">
-            <h3 class="stat-number">--</h3>
-            <p class="stat-label">Handicap</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="action-grid">
-        <div class="action-card">
-          <div class="action-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-          </div>
-          <div class="action-content">
-            <h3 class="action-title">New Round</h3>
-            <p class="action-description">Start tracking a new golf round</p>
-            <button class="action-button primary">Start Round</button>
-          </div>
-        </div>
-        
-        <div class="action-card">
-          <div class="action-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14,2 14,8 20,8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10,9 9,9 8,9"></polyline>
-            </svg>
-          </div>
-          <div class="action-content">
-            <h3 class="action-title">View History</h3>
-            <p class="action-description">Review your past rounds and scores</p>
-            <button class="action-button secondary">View Rounds</button>
-          </div>
-        </div>
-        
-        <div class="action-card">
-          <div class="action-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <div class="action-content">
-            <h3 class="action-title">Profile</h3>
-            <p class="action-description">Update your profile and preferences</p>
-            <button class="action-button secondary">Edit Profile</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="recent-activity">
-        <h3 class="section-title">Recent Activity</h3>
-        <div class="activity-placeholder">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
-            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-            <line x1="9" y1="9" x2="9.01" y2="9"></line>
-            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            <path d="M12 6v6l4 2"></path>
           </svg>
-          <h4>Welcome to RGS!</h4>
-          <p>Start by recording your first golf round to see your activity here.</p>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-number">0</h3>
+          <p class="stat-label">Rounds Played</p>
         </div>
       </div>
-    </main>
-  </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-number">--</h3>
+          <p class="stat-label">Average Score</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-number">0</h3>
+          <p class="stat-label">Playing Partners</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-number">{{ currentHandicap || '--' }}</h3>
+          <p class="stat-label">Current Handicap</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-grid">
+      <div class="action-card">
+        <div class="action-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="action-content">
+          <h3 class="action-title">New Round</h3>
+          <p class="action-description">Start tracking a new golf round</p>
+          <button class="action-button primary">Start Round</button>
+        </div>
+      </div>
+      
+      <div class="action-card">
+        <div class="action-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10,9 9,9 8,9"></polyline>
+          </svg>
+        </div>
+        <div class="action-content">
+          <h3 class="action-title">View History</h3>
+          <p class="action-description">Review your past rounds and scores</p>
+          <button class="action-button secondary">View Rounds</button>
+        </div>
+      </div>
+      
+      <div class="action-card">
+        <div class="action-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="action-content">
+          <h3 class="action-title">Profile</h3>
+          <p class="action-description">Update your profile and preferences</p>
+          <router-link to="/profile" class="action-button secondary">Edit Profile</router-link>
+        </div>
+      </div>
+    </div>
+    
+    <div class="recent-activity">
+      <h3 class="section-title">Recent Activity</h3>
+      <div class="activity-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+        </svg>
+        <h4>Welcome to RGS!</h4>
+        <p>Start by recording your first golf round to see your activity here.</p>
+      </div>
+    </div>
+  </AppLayout>
 </template>
 
 <script>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
-import UserHandicapManagement from '@/components/UserHandicapManagement.vue'
+import AppLayout from '@/components/AppLayout.vue'
 
 export default {
   name: 'Dashboard',
   components: {
-    UserHandicapManagement
+    AppLayout
   },
   setup() {
-    const router = useRouter()
     const authStore = useAuthStore()
     
     const firstName = computed(() => {
       return authStore.currentUser?.first_name || 'User'
     })
     
-    const fullName = computed(() => {
+    const currentHandicap = computed(() => {
       const user = authStore.currentUser
-      if (user) {
-        return `${user.first_name} ${user.last_name}`
+      if (user && user.current_handicap !== null) {
+        return user.current_handicap
       }
-      return 'User'
+      return null
     })
-    
-    const userInitials = computed(() => {
-      const user = authStore.currentUser
-      if (user) {
-        const first = user.first_name?.[0] || ''
-        const last = user.last_name?.[0] || ''
-        return (first + last).toUpperCase()
-      }
-      return 'U'
-    })
-    
-    const handleLogout = async () => {
-      await authStore.logout()
-      router.push('/')
-    }
     
     return {
-      authStore,
       firstName,
-      fullName,
-      userInitials,
-      handleLogout
+      currentHandicap
     }
   }
 }
 </script>
 
 <style scoped>
-.dashboard-container {
-  min-height: 100vh;
-  background: #f8fafc;
-}
-
-.dashboard-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.logo {
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 0;
-  color: #1e293b;
-}
-
-.tagline {
-  font-size: 0.9rem;
-  color: #64748b;
-  font-weight: 400;
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #2563eb;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 0.9rem;
-}
-
-.user-email {
-  font-size: 0.8rem;
-  color: #64748b;
-}
-
-.logout-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.logout-button:hover {
-  background: #e2e8f0;
-  color: #475569;
-}
-
-.dashboard-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
 .welcome-section {
   text-align: center;
   margin-bottom: 3rem;
+  padding: 2rem;
 }
 
 .welcome-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .welcome-subtitle {
   font-size: 1.1rem;
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0;
   font-weight: 400;
-}
-
-.admin-nav {
-  margin-bottom: 2rem;
-}
-
-.admin-link {
-  background: #2563eb;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-.admin-link:hover {
-  background: #1d4ed8;
-}
-
-.handicap-section {
-  margin-bottom: 3rem;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin: 0 2rem 3rem 2rem;
 }
 
 .stat-card {
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px var(--theme-shadow);
+  border: 1px solid var(--theme-border);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -390,12 +196,12 @@ export default {
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 6px var(--theme-shadow-strong);
   transform: translateY(-1px);
 }
 
 .stat-icon {
-  background: #2563eb;
+  background: var(--theme-primary);
   color: white;
   padding: 0.75rem;
   border-radius: 6px;
@@ -411,13 +217,13 @@ export default {
 .stat-number {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.25rem 0;
 }
 
 .stat-label {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0;
 }
 
@@ -425,27 +231,27 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin: 0 2rem 3rem 2rem;
 }
 
 .action-card {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px var(--theme-shadow);
+  border: 1px solid var(--theme-border);
   text-align: center;
   transition: all 0.2s ease;
 }
 
 .action-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 6px var(--theme-shadow-strong);
   transform: translateY(-1px);
 }
 
 .action-icon {
-  background: #f1f5f9;
-  color: #2563eb;
+  background: var(--theme-border-light);
+  color: var(--theme-primary);
   width: 64px;
   height: 64px;
   border-radius: 12px;
@@ -458,12 +264,12 @@ export default {
 .action-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .action-description {
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0 0 1.5rem 0;
   line-height: 1.5;
 }
@@ -476,47 +282,50 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .action-button.primary {
-  background: #2563eb;
+  background: var(--theme-primary);
   color: white;
 }
 
 .action-button.primary:hover {
-  background: #1d4ed8;
+  background: var(--theme-primary-dark);
 }
 
 .action-button.secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  background: var(--theme-border-light);
+  color: var(--theme-text-secondary);
+  border: 1px solid var(--theme-border);
 }
 
 .action-button.secondary:hover {
-  background: #e2e8f0;
-  color: #334155;
+  background: var(--theme-border);
+  color: var(--theme-text-primary);
 }
 
 .recent-activity {
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px var(--theme-shadow);
+  border: 1px solid var(--theme-border);
+  margin: 0 2rem;
 }
 
 .section-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 1.5rem 0;
 }
 
 .activity-placeholder {
   text-align: center;
   padding: 3rem 1rem;
-  color: #64748b;
+  color: var(--theme-text-secondary);
 }
 
 .activity-placeholder svg {
@@ -526,7 +335,7 @@ export default {
 
 .activity-placeholder h4 {
   font-size: 1.1rem;
-  color: #475569;
+  color: var(--theme-text-secondary);
   margin: 0 0 0.5rem 0;
 }
 
@@ -536,37 +345,9 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .header-content {
-    padding: 0 1rem;
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .logo-section {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .user-section {
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    gap: 1rem;
-  }
-  
-  .user-info {
-    flex: 1;
-  }
-  
-  .logout-button {
-    flex-shrink: 0;
-    padding: 0.75rem 1rem;
-    font-size: 0.8rem;
-  }
-  
-  .dashboard-main {
+  .welcome-section {
     padding: 1rem;
+    margin-bottom: 2rem;
   }
   
   .welcome-title {
@@ -580,6 +361,7 @@ export default {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    margin: 0 1rem 2rem 1rem;
   }
   
   .stat-card {
@@ -604,6 +386,7 @@ export default {
   .action-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin: 0 1rem 2rem 1rem;
   }
   
   .action-card {
@@ -631,6 +414,7 @@ export default {
   
   .recent-activity {
     padding: 1.5rem;
+    margin: 0 1rem;
   }
   
   .section-title {
@@ -651,34 +435,8 @@ export default {
 }
 
 @media (max-width: 480px) {
-  .header-content {
-    padding: 0 0.5rem;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-  }
-  
-  .tagline {
-    font-size: 0.8rem;
-  }
-  
-  .user-section {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .logout-button {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .dashboard-main {
-    padding: 0.5rem;
-  }
-  
   .welcome-section {
-    margin-bottom: 2rem;
+    padding: 0.5rem;
   }
   
   .welcome-title {
@@ -688,7 +446,7 @@ export default {
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin: 0 0.5rem 1.5rem 0.5rem;
   }
   
   .stat-card {
@@ -697,7 +455,7 @@ export default {
   
   .action-grid {
     gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin: 0 0.5rem 1.5rem 0.5rem;
   }
   
   .action-card {
@@ -706,6 +464,7 @@ export default {
   
   .recent-activity {
     padding: 1.25rem;
+    margin: 0 0.5rem;
   }
   
   .activity-placeholder {

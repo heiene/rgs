@@ -74,13 +74,31 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
-    FLASK_RUN_PORT = int(os.environ.get('PORT', 5000))  # Heroku uses PORT env var
+    FLASK_RUN_PORT = int(os.environ.get('PORT', 5000))  # Render uses PORT env var
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     
     # Production security settings
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    # CORS settings for production
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '').split(',') if os.environ.get('CORS_ORIGINS') else ['*']
+    
+    # Security headers
+    FORCE_HTTPS = True
+    PREFERRED_URL_SCHEME = 'https'
+    
+    # Database connection settings for production
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'pool_size': 10,
+        'max_overflow': 20,
+        'connect_args': {
+            'sslmode': 'require'  # Require SSL for database connections
+        }
+    }
 
 
 # Configuration dictionary

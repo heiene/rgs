@@ -94,21 +94,41 @@ class HandicapService:
         user = User.query.get(user_id)
         if not user:
             raise ValueError("User not found")
+        
+        # Get the user who is creating this handicap for auto-generation of reason
+        created_by_user = User.query.get(created_by_id)
+        if not created_by_user:
+            raise ValueError("Created by user not found")
+        
+        # Auto-generate reason if not provided or empty
+        reason = handicap_data.get('reason', '').strip()
+        if not reason:
+            # Check if this is the user's first handicap
+            existing_handicaps = Handicap.query.filter_by(user_id=user_id).count()
+            if existing_handicaps == 0:
+                reason = f"Initial handicap set by {created_by_user.full_name}"
+            else:
+                reason = f"Handicap updated by {created_by_user.full_name}"
 
         try:
             # Handle temporal logic for inserting handicap into history
             HandicapService._insert_handicap_into_timeline(
-                user_id, new_value, new_start_date, created_by_id, handicap_data.get('reason', 'Manual entry')
+                user_id, new_value, new_start_date, created_by_id, reason
             )
             
-            # Return the newly created handicap
-            new_handicap = Handicap.query.filter_by(
-                user_id=user_id, 
-                start_date=new_start_date,
-                handicap_value=new_value
-            ).first()
-            
-            return new_handicap.to_dict()
+            # Return the current handicap (the one active today) rather than the newly created one
+            # This is important because with temporal logic, the newly created handicap might not be current
+            current_handicap = HandicapService.get_current_handicap(user_id)
+            if current_handicap:
+                return current_handicap
+            else:
+                # Fallback to the newly created handicap if no current one found
+                new_handicap = Handicap.query.filter_by(
+                    user_id=user_id, 
+                    start_date=new_start_date,
+                    handicap_value=new_value
+                ).first()
+                return new_handicap.to_dict()
             
         except IntegrityError:
             db.session.rollback()
@@ -218,37 +238,6 @@ class HandicapService:
         db.session.delete(handicap)
         db.session.commit()
         return True
-
-    @staticmethod
-    def set_initial_handicap(user_id: int, handicap_value: float, created_by_id: int, start_date: date = None) -> Dict[str, Any]:
-        """
-        Set a user's initial handicap.
-        
-        Args:
-            user_id: The user ID
-            handicap_value: Initial handicap value
-            created_by_id: ID of user creating the handicap
-            start_date: Start date (defaults to today)
-            
-        Returns:
-            Created handicap dictionary
-        """
-        if start_date is None:
-            start_date = date.today()
-            
-        # Check if user already has handicaps
-        existing = Handicap.query.filter_by(user_id=user_id).first()
-        if existing:
-            raise ValueError("User already has handicap entries. Use create_handicap for additional entries.")
-        
-        handicap_data = {
-            'user_id': user_id,
-            'handicap_value': handicap_value,
-            'start_date': start_date,
-            'reason': 'Initial handicap'
-        }
-        
-        return HandicapService.create_handicap(handicap_data, created_by_id)
 
     @staticmethod
     def calculate_handicap_differential(gross_score: int, course_rating: float, slope_rating: float) -> float:

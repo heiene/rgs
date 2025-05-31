@@ -5,7 +5,7 @@ const API_BASE_URL = 'http://127.0.0.1:5000/api/v1'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
+    user: JSON.parse(localStorage.getItem('user')) || null,
     token: localStorage.getItem('token') || null,
     isAuthenticated: !!localStorage.getItem('token'),
     loading: false,
@@ -35,6 +35,7 @@ export const useAuthStore = defineStore('auth', {
           this.isAuthenticated = true
           
           localStorage.setItem('token', this.token)
+          localStorage.setItem('user', JSON.stringify(this.user))
           
           // Set default axios header for future requests
           axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
@@ -64,6 +65,7 @@ export const useAuthStore = defineStore('auth', {
           this.isAuthenticated = true
           
           localStorage.setItem('token', this.token)
+          localStorage.setItem('user', JSON.stringify(this.user))
           axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
           
           return { success: true }
@@ -93,6 +95,7 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = false
         
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
         delete axios.defaults.headers.common['Authorization']
       }
     },
@@ -107,9 +110,95 @@ export const useAuthStore = defineStore('auth', {
         
         this.user = response.data.user
         this.isAuthenticated = true
+        localStorage.setItem('user', JSON.stringify(this.user))
       } catch (error) {
         console.warn('Failed to get current user:', error)
         this.logout()
+      }
+    },
+    
+    async updateProfile(profileData) {
+      this.loading = true
+      this.error = null
+      
+      console.log('🔄 Starting profile update...')
+      console.log('Current token:', this.token)
+      console.log('Axios default auth header:', axios.defaults.headers.common['Authorization'])
+      
+      try {
+        // Filter out email and other fields that can't be updated via this endpoint
+        const updateData = {
+          first_name: profileData.first_name?.trim(),
+          last_name: profileData.last_name?.trim(),
+          sex: profileData.sex,
+          country: profileData.country?.trim() || null,
+          city: profileData.city?.trim() || null,
+          address: profileData.address?.trim() || null,
+          postal_code: profileData.postal_code?.trim() || null,
+          timezone: profileData.timezone,
+          distance_unit: profileData.distance_unit
+        }
+
+        // Validate required fields
+        if (!updateData.first_name || updateData.first_name.length === 0) {
+          this.error = 'First name is required'
+          return { success: false, error: this.error }
+        }
+        
+        if (!updateData.last_name || updateData.last_name.length === 0) {
+          this.error = 'Last name is required'
+          return { success: false, error: this.error }
+        }
+
+        // Validate distance_unit
+        if (!['meters', 'yards'].includes(updateData.distance_unit)) {
+          updateData.distance_unit = 'yards' // default fallback
+        }
+
+        // Remove null values to avoid sending them
+        Object.keys(updateData).forEach(key => {
+          if (updateData[key] === null || updateData[key] === '') {
+            delete updateData[key]
+          }
+        })
+
+        console.log('Sending profile update data:', updateData)
+
+        const response = await axios.put(`${API_BASE_URL}/users/profile`, updateData, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        })
+        
+        if (response.data.success) {
+          this.user = { ...this.user, ...response.data.data }
+          localStorage.setItem('user', JSON.stringify(this.user))
+          return { success: true }
+        }
+      } catch (error) {
+        console.error('Profile update error:', error)
+        console.error('Error response:', error.response?.data)
+        
+        // Log validation details more clearly
+        if (error.response?.data?.details) {
+          console.error('Validation details:', JSON.stringify(error.response.data.details, null, 2))
+        }
+        
+        let errorMessage = 'Profile update failed'
+        if (error.response?.data?.details) {
+          const details = error.response.data.details
+          const fieldErrors = Object.entries(details).map(([field, errors]) => 
+            `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`
+          ).join('; ')
+          errorMessage = `Validation errors: ${fieldErrors}`
+        } else if (error.response?.data?.error) {
+          errorMessage = error.response.data.error
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message
+        }
+        
+        this.error = errorMessage
+        return { success: false, error: this.error }
+      } finally {
+        this.loading = false
       }
     },
     
@@ -128,10 +217,45 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     
+    isTokenExpired() {
+      if (!this.token) return true
+      
+      try {
+        const payload = JSON.parse(atob(this.token.split('.')[1]))
+        const currentTime = Date.now() / 1000
+        console.log('🕒 Token expires at:', new Date(payload.exp * 1000))
+        console.log('🕒 Current time:', new Date(currentTime * 1000))
+        console.log('🕒 Token expired?', payload.exp < currentTime)
+        return payload.exp < currentTime
+      } catch (error) {
+        console.error('Error parsing token:', error)
+        return true
+      }
+    },
+    
     initializeAuth() {
+      console.log('🔐 Initializing auth...')
+      console.log('Token in state:', this.token)
+      console.log('Token in localStorage:', localStorage.getItem('token'))
+      console.log('User in state:', this.user)
+      console.log('User in localStorage:', localStorage.getItem('user'))
+      
       if (this.token) {
+        if (this.isTokenExpired()) {
+          console.log('⏰ Token is expired, logging out...')
+          this.logout()
+          return
+        }
+        
+        console.log('✅ Setting axios default header with token')
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-        this.getCurrentUser()
+        // Only fetch user data if we don't have it in localStorage
+        if (!this.user) {
+          console.log('👤 Fetching current user data...')
+          this.getCurrentUser()
+        }
+      } else {
+        console.log('❌ No token found, user needs to login')
       }
     }
   }

@@ -12,8 +12,7 @@ from app.services.handicap_service import HandicapService
 from app.services.user_service import UserService
 from app.services.auth_service import token_required, admin_required
 from app.schemas.handicap_schema import (
-    HandicapCreateSchema, HandicapUpdateSchema, HandicapResponseSchema,
-    InitialHandicapSchema
+    HandicapCreateSchema, HandicapUpdateSchema, HandicapResponseSchema
 )
 
 handicap_bp = Blueprint('handicaps', __name__)
@@ -22,7 +21,6 @@ handicap_bp = Blueprint('handicaps', __name__)
 handicap_create_schema = HandicapCreateSchema()
 handicap_update_schema = HandicapUpdateSchema()
 handicap_response_schema = HandicapResponseSchema()
-initial_handicap_schema = InitialHandicapSchema()
 
 
 # Admin Routes - Can manage all users' handicaps
@@ -113,53 +111,6 @@ def admin_get_user_current_handicap(user_id):
         return jsonify({
             'success': False,
             'error': 'Failed to retrieve current handicap',
-            'message': str(e)
-        }), 500
-
-
-@handicap_bp.route('/admin/users/<int:user_id>/handicaps/initial', methods=['POST'])
-@admin_required
-def admin_set_initial_handicap(user_id):
-    """Set initial handicap for any user (admin only)"""
-    try:
-        current_user_id = int(get_jwt_identity())
-        
-        # Validate request data
-        handicap_data = initial_handicap_schema.load(request.json)
-        
-        # Ensure user_id matches URL parameter
-        handicap_data['user_id'] = user_id
-        
-        # Set initial handicap via service
-        handicap = HandicapService.set_initial_handicap(
-            user_id, 
-            handicap_data['handicap_value'], 
-            current_user_id
-        )
-        
-        return jsonify({
-            'success': True,
-            'data': handicap,
-            'message': 'Initial handicap set successfully'
-        }), 201
-        
-    except ValidationError as e:
-        return jsonify({
-            'success': False,
-            'error': 'Validation failed',
-            'details': e.messages
-        }), 400
-        
-    except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': 'Failed to set initial handicap',
             'message': str(e)
         }), 500
 
@@ -330,49 +281,5 @@ def update_my_handicap():
         return jsonify({
             'success': False,
             'error': 'Failed to update handicap',
-            'message': str(e)
-        }), 500
-
-
-@handicap_bp.route('/my-handicaps/initial', methods=['POST'])
-@token_required
-def set_my_initial_handicap():
-    """Set current user's initial handicap"""
-    try:
-        current_user_id = int(get_jwt_identity())
-        
-        # Validate request data
-        handicap_data = initial_handicap_schema.load(request.json)
-        
-        # Set initial handicap via service
-        handicap = HandicapService.set_initial_handicap(
-            current_user_id, 
-            handicap_data['handicap_value'], 
-            current_user_id
-        )
-        
-        return jsonify({
-            'success': True,
-            'data': handicap,
-            'message': 'Initial handicap set successfully'
-        }), 201
-        
-    except ValidationError as e:
-        return jsonify({
-            'success': False,
-            'error': 'Validation failed',
-            'details': e.messages
-        }), 400
-        
-    except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 400
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': 'Failed to set initial handicap',
             'message': str(e)
         }), 500 

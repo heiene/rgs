@@ -183,7 +183,7 @@ class TestUserAuthentication:
         response = client.post('/api/v1/auth/login', json=login_data)
         
         # Assert
-        assert response.status_code == 200
+            assert response.status_code == 200
         data = response.get_json()
         assert 'access_token' in data
         assert data['user']['email'] == 'test@example.com'
