@@ -37,6 +37,7 @@
             </router-link>
 
             <!-- Admin Dashboard - Only for Admins -->
+            <!-- Debug: {{ authStore.currentUser }} -->
             <router-link 
               v-if="authStore.currentUser?.is_admin" 
               to="/admin-dashboard" 

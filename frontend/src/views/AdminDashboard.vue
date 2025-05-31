@@ -3,7 +3,7 @@
     <div class="admin-dashboard">
       <div class="admin-header">
         <h1 class="admin-title">Admin Dashboard</h1>
-        <p class="admin-subtitle">Manage users, courses, clubs, and system settings</p>
+        <p class="admin-subtitle">Manage users, courses, clubs, and tournaments</p>
       </div>
 
       <div class="admin-grid">
@@ -18,30 +18,9 @@
             <h3 class="admin-card-title">User Management</h3>
             <p class="admin-card-description">Manage user accounts, permissions, and handicaps</p>
             <div class="admin-stats">
-              <span class="stat-item">{{ userStats.total }} Users</span>
-              <span class="stat-item">{{ userStats.admins }} Admins</span>
-            </div>
-          </div>
-          <div class="admin-arrow">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9,18 15,12 9,6"></polyline>
-            </svg>
-          </div>
-        </div>
-
-        <div class="admin-card" @click="navigateTo('/admin/courses')">
-          <div class="admin-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-            </svg>
-          </div>
-          <div class="admin-content">
-            <h3 class="admin-card-title">Course Management</h3>
-            <p class="admin-card-description">Add and manage golf courses and their layouts</p>
-            <div class="admin-stats">
-              <span class="stat-item">{{ courseStats.total }} Courses</span>
-              <span class="stat-item">{{ courseStats.holes }} Total Holes</span>
+              <span class="stat-item">{{ userStats.total || 0 }} Users</span>
+              <span class="stat-item">{{ userStats.admins || 0 }} Admins</span>
+              <span class="stat-item">{{ userStats.handicaps || 0 }} Handicaps</span>
             </div>
           </div>
           <div class="admin-arrow">
@@ -61,8 +40,8 @@
             <h3 class="admin-card-title">Club Management</h3>
             <p class="admin-card-description">Manage golf clubs and their memberships</p>
             <div class="admin-stats">
-              <span class="stat-item">{{ clubStats.total }} Clubs</span>
-              <span class="stat-item">{{ clubStats.members }} Members</span>
+              <span class="stat-item">{{ clubStats.total || 0 }} Clubs</span>
+              <span class="stat-item">{{ clubStats.members || 0 }} Members</span>
             </div>
           </div>
           <div class="admin-arrow">
@@ -72,19 +51,45 @@
           </div>
         </div>
 
-        <div class="admin-card" @click="navigateTo('/admin/tee-sets')">
+        <div class="admin-card" @click="navigateTo('/admin/courses')">
           <div class="admin-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
           </div>
           <div class="admin-content">
-            <h3 class="admin-card-title">Tee Set Management</h3>
-            <p class="admin-card-description">Configure tee sets and course ratings</p>
+            <h3 class="admin-card-title">Course Management</h3>
+            <p class="admin-card-description">Manage golf courses, holes, and tee sets</p>
             <div class="admin-stats">
-              <span class="stat-item">{{ teeStats.total }} Tee Sets</span>
-              <span class="stat-item">{{ teeStats.courses }} Courses</span>
+              <span class="stat-item">{{ courseStats.total || 0 }} Courses</span>
+              <span class="stat-item">{{ courseStats.holes || 0 }} Holes</span>
+              <span class="stat-item">{{ courseStats.teeSets || 0 }} Tee Sets</span>
+            </div>
+          </div>
+          <div class="admin-arrow">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="admin-card tournament-coming-soon" @click="navigateTo('/admin/tournaments')">
+          <div class="admin-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+          </div>
+          <div class="admin-content">
+            <h3 class="admin-card-title">Tournament Management</h3>
+            <p class="admin-card-description">Organize and manage tournaments (Coming in Phase 2)</p>
+            <div class="admin-stats">
+              <span class="stat-item coming-soon">Phase 2</span>
             </div>
           </div>
           <div class="admin-arrow">
@@ -166,7 +171,11 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
 import AppLayout from '@/components/AppLayout.vue'
+import axios from 'axios'
+
+const API_BASE_URL = 'http://127.0.0.1:5000/api/v1'
 
 export default {
   name: 'AdminDashboard',
@@ -175,26 +184,24 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const authStore = useAuthStore()
     
-    // Mock data - replace with actual API calls
+    // Stats data
     const userStats = ref({
       total: 0,
-      admins: 0
+      admins: 0,
+      handicaps: 0
     })
     
     const courseStats = ref({
       total: 0,
-      holes: 0
+      holes: 0,
+      teeSets: 0
     })
     
     const clubStats = ref({
       total: 0,
       members: 0
-    })
-    
-    const teeStats = ref({
-      total: 0,
-      courses: 0
     })
     
     const systemStats = ref({
@@ -207,53 +214,118 @@ export default {
       scoreChange: 0
     })
     
+    const loading = ref(true)
+    const error = ref(null)
+    
     const navigateTo = (path) => {
-      router.push(path)
+      // Navigate to User Management (implemented)
+      if (path === '/admin/users') {
+        router.push(path)
+      } 
+      // For tournament management (Phase 2)
+      else if (path === '/admin/tournaments') {
+        alert(`Tournament Management is coming in Phase 2! This will include tournament creation, player registration, scoring, and results management.`)
+      } 
+      // For other admin pages not yet implemented
+      else {
+        alert(`Admin page "${path}" is coming soon! This will be implemented in the next phase.`)
+      }
     }
     
-    const loadStats = async () => {
-      // Mock data - replace with actual API calls
-      userStats.value = {
-        total: 156,
-        admins: 3
+    const loadUserStats = async () => {
+      try {
+        // This would be an admin endpoint to get user statistics
+        // For now, using mock data until backend admin endpoints are ready
+        userStats.value = {
+          total: 23,
+          admins: 2,
+          handicaps: 45
+        }
+      } catch (error) {
+        console.error('Failed to load user stats:', error)
       }
-      
-      courseStats.value = {
-        total: 12,
-        holes: 216
+    }
+    
+    const loadCourseStats = async () => {
+      try {
+        // Mock data - replace with real API call when course endpoints are ready
+        courseStats.value = {
+          total: 5,
+          holes: 90,
+          teeSets: 20
+        }
+      } catch (error) {
+        console.error('Failed to load course stats:', error)
       }
-      
-      clubStats.value = {
-        total: 8,
-        members: 1240
+    }
+    
+    const loadClubStats = async () => {
+      try {
+        // Mock data - replace with real API call when club endpoints are ready
+        clubStats.value = {
+          total: 3,
+          members: 156
+        }
+      } catch (error) {
+        console.error('Failed to load club stats:', error)
       }
-      
-      teeStats.value = {
-        total: 48,
-        courses: 12
+    }
+    
+    const loadSystemStats = async () => {
+      try {
+        // Combine various stats for system overview
+        systemStats.value = {
+          totalUsers: userStats.value.total,
+          newUsers: 3,
+          totalRounds: 127,
+          newRounds: 8,
+          activeUsers: 15,
+          avgScore: 87.2,
+          scoreChange: 2.1
+        }
+      } catch (error) {
+        console.error('Failed to load system stats:', error)
       }
+    }
+    
+    const loadAllStats = async () => {
+      loading.value = true
+      error.value = null
       
-      systemStats.value = {
-        totalUsers: 156,
-        newUsers: 12,
-        totalRounds: 1847,
-        newRounds: 23,
-        activeUsers: 89,
-        avgScore: 84.2,
-        scoreChange: 1.3
+      try {
+        await Promise.all([
+          loadUserStats(),
+          loadCourseStats(),
+          loadClubStats()
+        ])
+        
+        // Load system stats after individual stats are loaded
+        await loadSystemStats()
+      } catch (err) {
+        error.value = 'Failed to load dashboard data'
+        console.error('Error loading admin dashboard data:', err)
+      } finally {
+        loading.value = false
       }
     }
     
     onMounted(() => {
-      loadStats()
+      // Check if user is admin
+      if (!authStore.currentUser?.is_admin) {
+        router.push('/dashboard')
+        return
+      }
+      
+      loadAllStats()
     })
     
     return {
       userStats,
       courseStats,
       clubStats,
-      teeStats,
       systemStats,
+      loading,
+      error,
       navigateTo
     }
   }
@@ -273,13 +345,13 @@ export default {
 .admin-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .admin-subtitle {
   font-size: 1.1rem;
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0;
   font-weight: 400;
 }
@@ -292,11 +364,11 @@ export default {
 }
 
 .admin-card {
-  background: white;
+  background: var(--theme-bg-card);
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--theme-shadow);
+  border: 1px solid var(--theme-border);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -305,14 +377,38 @@ export default {
 }
 
 .admin-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--theme-shadow-strong);
   transform: translateY(-1px);
-  border-color: #2563eb;
+  border-color: var(--theme-primary);
+}
+
+.admin-card.tournament-coming-soon {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+.admin-card.tournament-coming-soon:hover {
+  opacity: 0.8;
+  transform: none;
+  border-color: var(--theme-border);
+}
+
+.admin-card.tournament-coming-soon .admin-icon {
+  background: var(--theme-border-light);
+  color: var(--theme-text-muted);
+}
+
+.admin-card.tournament-coming-soon .admin-card-title {
+  color: var(--theme-text-secondary);
+}
+
+.admin-card.tournament-coming-soon .admin-card-description {
+  color: var(--theme-text-muted);
 }
 
 .admin-icon {
-  background: #f1f5f9;
-  color: #2563eb;
+  background: var(--theme-bg-card-alt);
+  color: var(--theme-primary);
   padding: 1rem;
   border-radius: 8px;
   display: flex;
@@ -328,12 +424,12 @@ export default {
 .admin-card-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .admin-card-description {
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0 0 1rem 0;
   line-height: 1.5;
 }
@@ -345,30 +441,30 @@ export default {
 
 .stat-item {
   font-size: 0.8rem;
-  color: #475569;
-  background: #f1f5f9;
+  color: var(--theme-text-muted);
+  background: var(--theme-bg-card-alt);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-weight: 500;
 }
 
 .admin-arrow {
-  color: #64748b;
+  color: var(--theme-text-secondary);
   flex-shrink: 0;
 }
 
 .quick-stats {
-  background: white;
+  background: var(--theme-bg-card);
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--theme-shadow);
+  border: 1px solid var(--theme-border);
 }
 
 .section-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 1.5rem 0;
 }
 
@@ -383,18 +479,18 @@ export default {
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--theme-bg-card-alt);
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--theme-border);
   transition: all 0.2s ease;
 }
 
 .quick-stat-card:hover {
-  background: #f1f5f9;
+  background: var(--theme-nav-hover);
 }
 
 .quick-stat-icon {
-  background: #2563eb;
+  background: var(--theme-primary);
   color: white;
   padding: 0.75rem;
   border-radius: 6px;
@@ -411,13 +507,13 @@ export default {
 .quick-stat-number {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--theme-text-primary);
   margin: 0 0 0.25rem 0;
 }
 
 .quick-stat-label {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--theme-text-secondary);
   margin: 0 0 0.25rem 0;
 }
 
@@ -429,18 +525,24 @@ export default {
 }
 
 .quick-stat-change.positive {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--theme-success-light);
+  color: var(--theme-success);
 }
 
 .quick-stat-change.negative {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--theme-error-light);
+  color: var(--theme-error);
 }
 
 .quick-stat-change.neutral {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--theme-bg-card-alt);
+  color: var(--theme-text-muted);
+}
+
+.stat-item.coming-soon {
+  background: var(--theme-warning-light);
+  color: var(--theme-warning);
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {

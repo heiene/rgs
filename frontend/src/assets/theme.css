@@ -2,12 +2,14 @@
    GLOBAL THEME COLORS - Light Theme (Grey Shades)
    ============================================================================= */
 :root {
-  --theme-primary: #374151;           /* Primary accent color (dark grey) */
+  --theme-primary: #7f91ad;           /* Primary accent color (dark grey) */
   --theme-primary-light: #9ca3af;     /* Light variant (medium grey) */
-  --theme-primary-dark: #1f2937;      /* Dark variant (very dark grey) */
+  --theme-primary-dark: #6e84a4;      /* Dark variant (very dark grey) */
   --theme-bg-main: #f9fafb;           /* Main background (very light grey) */
   --theme-bg-sidebar: #ffffff;        /* Sidebar background (white) */
   --theme-bg-header: #ffffff;         /* Header background (white) */
+  --theme-bg-card: #ffffff;           /* Card background (white) */
+  --theme-bg-card-alt: #f8fafc;       /* Alternative card background (very light grey) */
   --theme-text-primary: #111827;      /* Primary text (almost black) */
   --theme-text-secondary: #6b7280;    /* Secondary text (medium grey) */
   --theme-text-muted: #9ca3af;        /* Muted text (light grey) */
@@ -22,8 +24,11 @@
   
   /* Additional theme colors for buttons and elements */
   --theme-success: #065f46;           /* Success (dark green-grey) */
+  --theme-success-light: #dcfce7;     /* Success light background */
   --theme-error: #991b1b;             /* Error (dark red-grey) */
+  --theme-error-light: #fef2f2;       /* Error light background */
   --theme-warning: #92400e;           /* Warning (dark orange-grey) */
+  --theme-warning-light: #fef3c7;     /* Warning light background */
 }
 
 /* Apply theme to body for consistent background */

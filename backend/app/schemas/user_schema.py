@@ -26,6 +26,7 @@ class UserCreateSchema(Schema):
 
 class UserUpdateSchema(Schema):
     """Schema for updating an existing user"""
+    email = fields.Email()
     first_name = fields.Str(validate=validate.Length(min=1, max=50))
     last_name = fields.Str(validate=validate.Length(min=1, max=50))
     sex = fields.Str(validate=validate.OneOf(['M', 'F']))
@@ -94,8 +95,9 @@ class UserListSchema(Schema):
 
 class UserSearchSchema(Schema):
     """Schema for user search parameters"""
+    page = fields.Int(missing=1, validate=validate.Range(min=1))
+    per_page = fields.Int(missing=20, validate=validate.Range(min=1, max=100))
     search = fields.Str()
     club_id = fields.Int()
     is_active = fields.Bool()
-    page = fields.Int(missing=1, validate=validate.Range(min=1))
-    per_page = fields.Int(missing=20, validate=validate.Range(min=1, max=100)) 
+    is_admin = fields.Bool() 

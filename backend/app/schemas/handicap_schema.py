@@ -11,8 +11,8 @@ class HandicapCreateSchema(Schema):
     """Schema for creating a new handicap"""
     user_id = fields.Int(required=True)
     handicap_value = fields.Float(required=True, validate=validate.Range(min=-5, max=54))
-    start_date = fields.Date(missing=date.today)
-    reason = fields.Str(validate=validate.Length(max=200))
+    start_date = fields.Date(missing=date.today, format='%Y-%m-%d')
+    reason = fields.Str(validate=validate.Length(max=200), allow_none=True, missing='')
     created_by_id = fields.Int(required=True)
 
 

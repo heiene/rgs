@@ -4,6 +4,7 @@ import Welcome from '@/views/Welcome.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Profile from '@/views/Profile.vue'
 import AdminDashboard from '@/views/AdminDashboard.vue'
+import AdminUserManagement from '@/views/AdminUserManagement.vue'
 
 const routes = [
   {
@@ -28,6 +29,12 @@ const routes = [
     path: '/admin-dashboard',
     name: 'AdminDashboard',
     component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/admin/users',
+    name: 'AdminUserManagement',
+    component: AdminUserManagement,
     meta: { requiresAuth: true, requiresAdmin: true }
   }
   // Admin routes (commented out until components are created)

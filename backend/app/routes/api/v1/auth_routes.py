@@ -2,7 +2,7 @@
 Authentication API routes
 """
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token, get_jwt
 from marshmallow import Schema, fields, ValidationError, validate
 from app.models.user import User
 from app.services.user_service import UserService
@@ -67,15 +67,16 @@ def login():
         # Update last login
         UserService.update_last_login(user.id)
         
-        # Create tokens
-        access_token = create_access_token(identity=str(user.id))
-        refresh_token = create_refresh_token(identity=str(user.id))
+        # Create tokens with additional claims
+        additional_claims = {"is_admin": user.is_admin}
+        access_token = create_access_token(identity=str(user.id), additional_claims=additional_claims)
+        refresh_token = create_refresh_token(identity=str(user.id), additional_claims=additional_claims)
         
         return jsonify({
             'success': True,
             'access_token': access_token,
             'refresh_token': refresh_token,
-            'user': user.to_dict()
+            'user': user.to_dict(include_sensitive=True)
         }), 200
         
     except ValidationError as e:
@@ -110,8 +111,9 @@ def register():
         # Get user data with admin field for registration response
         user_with_admin = user_obj.to_dict(include_sensitive=True)
         
-        # Create access token for immediate login
-        access_token = create_access_token(identity=str(user['id']))
+        # Create access token for immediate login with admin claims
+        additional_claims = {"is_admin": user_obj.is_admin}
+        access_token = create_access_token(identity=str(user['id']), additional_claims=additional_claims)
         
         return jsonify({
             'success': True,
@@ -149,7 +151,17 @@ def refresh():
     """Refresh access token"""
     try:
         current_user_id = get_jwt_identity()
-        new_token = create_access_token(identity=current_user_id)
+        
+        # Get user to include admin status in new token
+        user = User.query.get(int(current_user_id))
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+        
+        additional_claims = {"is_admin": user.is_admin}
+        new_token = create_access_token(identity=current_user_id, additional_claims=additional_claims)
         
         return jsonify({
             'success': True,
@@ -167,10 +179,10 @@ def refresh():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
-    """Get current user info"""
+    """Get current user info with real-time permission validation"""
     try:
         current_user_id = int(get_jwt_identity())
-        user = UserService.get_user_by_id(current_user_id)
+        user = UserService.get_user_by_id(current_user_id, include_sensitive=True)
         
         if not user:
             return jsonify({
@@ -178,10 +190,31 @@ def get_current_user():
                 'error': 'User not found'
             }), 404
         
-        return jsonify({
+        # Check if user account is deactivated
+        if not user.get('is_active', False):
+            return jsonify({
+                'success': False,
+                'error': 'Account deactivated',
+                'message': 'Your account has been deactivated',
+                'action_required': 'logout'
+            }), 403
+        
+        # Compare current admin status with JWT claims to detect changes
+        claims = get_jwt()
+        token_admin_status = claims.get('is_admin', False)
+        current_admin_status = user.get('is_admin', False)
+        
+        response_data = {
             'success': True,
             'user': user
-        }), 200
+        }
+        
+        # If admin status changed, signal that token needs refresh
+        if token_admin_status != current_admin_status:
+            response_data['action_required'] = 'token_refresh'
+            response_data['message'] = 'Your permissions have changed. Please refresh your session.'
+        
+        return jsonify(response_data), 200
         
     except Exception as e:
         return jsonify({

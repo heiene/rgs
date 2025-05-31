@@ -52,12 +52,13 @@ def admin_create_user_handicap(user_id):
     try:
         current_user_id = int(get_jwt_identity())
         
-        # Validate request data
-        handicap_data = handicap_create_schema.load(request.json)
+        # Get request data and add required fields before validation
+        request_data = request.json or {}
+        request_data['user_id'] = user_id
+        request_data['created_by_id'] = current_user_id
         
-        # Ensure user_id matches URL parameter
-        handicap_data['user_id'] = user_id
-        handicap_data['created_by_id'] = current_user_id
+        # Validate request data with required fields included
+        handicap_data = handicap_create_schema.load(request_data)
         
         # Create handicap via service
         handicap = HandicapService.create_handicap(handicap_data, current_user_id)
@@ -199,6 +200,28 @@ def get_my_handicaps():
     try:
         current_user_id = int(get_jwt_identity())
         handicaps = HandicapService.get_user_handicap_history(current_user_id)
+        
+        return jsonify({
+            'success': True,
+            'data': handicaps,
+            'count': len(handicaps)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to retrieve handicaps',
+            'message': str(e)
+        }), 500
+
+
+# Admin accessible route for any user's handicaps
+@handicap_bp.route('/user/<int:user_id>', methods=['GET'])
+@admin_required
+def get_user_handicaps(user_id):
+    """Get handicap history for any user (admin only)"""
+    try:
+        handicaps = HandicapService.get_user_handicap_history(user_id)
         
         return jsonify({
             'success': True,

@@ -38,7 +38,8 @@ def get_users():
             per_page=search_params.get('per_page', 20),
             search=search_params.get('search'),
             club_id=search_params.get('club_id'),
-            is_active=search_params.get('is_active')
+            is_active=search_params.get('is_active'),
+            is_admin=search_params.get('is_admin')
         )
         
         return jsonify({
@@ -318,7 +319,8 @@ def toggle_admin_status(user_id):
         return jsonify({
             'success': True,
             'data': updated_user,
-            'message': 'Admin status updated successfully'
+            'message': 'Admin status updated successfully',
+            'action_required': 'token_refresh'  # Signal frontend to refresh token/logout user
         }), 200
         
     except Exception as e:

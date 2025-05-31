@@ -9,7 +9,8 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('token') || null,
     isAuthenticated: !!localStorage.getItem('token'),
     loading: false,
-    error: null
+    error: null,
+    refreshInterval: null
   }),
   
   getters: {
@@ -39,6 +40,9 @@ export const useAuthStore = defineStore('auth', {
           
           // Set default axios header for future requests
           axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+          
+          // Start auto-refresh of user data
+          this.startUserDataRefresh()
           
           return { success: true }
         } else {
@@ -81,6 +85,9 @@ export const useAuthStore = defineStore('auth', {
     },
     
     async logout() {
+      // Stop auto-refresh
+      this.stopUserDataRefresh()
+      
       try {
         if (this.token) {
           await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
@@ -108,12 +115,43 @@ export const useAuthStore = defineStore('auth', {
           headers: { Authorization: `Bearer ${this.token}` }
         })
         
-        this.user = response.data.user
+        const data = response.data
+        
+        // Handle permission changes and account status
+        if (data.action_required) {
+          if (data.action_required === 'logout') {
+            console.warn('Account deactivated, logging out...')
+            await this.logout()
+            return { action: 'logout', message: data.message }
+          } else if (data.action_required === 'token_refresh') {
+            console.warn('Permissions changed, refreshing token...')
+            const refreshResult = await this.refreshToken()
+            if (!refreshResult.success) {
+              console.error('Token refresh failed, logging out...')
+              await this.logout()
+              return { action: 'logout', message: 'Session expired due to permission changes' }
+            }
+            return { action: 'refresh', message: data.message }
+          }
+        }
+        
+        // Update user data if everything is fine
+        this.user = data.user
         this.isAuthenticated = true
         localStorage.setItem('user', JSON.stringify(this.user))
+        
+        return { action: 'none' }
+        
       } catch (error) {
         console.warn('Failed to get current user:', error)
-        this.logout()
+        if (error.response?.status === 403) {
+          // Account deactivated or permissions revoked
+          await this.logout()
+          return { action: 'logout', message: 'Your access has been revoked' }
+        }
+        // For other errors, just logout to be safe
+        await this.logout()
+        return { action: 'logout', message: 'Authentication error' }
       }
     },
     
@@ -256,6 +294,58 @@ export const useAuthStore = defineStore('auth', {
         }
       } else {
         console.log('❌ No token found, user needs to login')
+      }
+    },
+
+    async refreshToken() {
+      if (!this.token) return { success: false }
+      
+      try {
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        })
+        
+        if (response.data.access_token) {
+          this.token = response.data.access_token
+          localStorage.setItem('token', this.token)
+          axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+          
+          // Refresh user data after token refresh
+          await this.getCurrentUser()
+          return { success: true }
+        }
+        
+        return { success: false }
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+        return { success: false }
+      }
+    },
+
+    // Auto-refresh user data every 30 seconds when app is active
+    startUserDataRefresh() {
+      if (this.refreshInterval) return // Already started
+      
+      this.refreshInterval = setInterval(async () => {
+        if (this.isAuthenticated && this.token) {
+          const result = await this.getCurrentUser()
+          
+          // Handle permission changes
+          if (result.action === 'logout') {
+            // User will be logged out automatically
+            this.stopUserDataRefresh()
+          } else if (result.action === 'refresh') {
+            // Show notification about permission changes
+            console.info('Your permissions have been updated')
+          }
+        }
+      }, 30000) // 30 seconds
+    },
+
+    stopUserDataRefresh() {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval)
+        this.refreshInterval = null
       }
     }
   }

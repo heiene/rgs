@@ -7,7 +7,7 @@ Focused on core user management functionality.
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func
 from app.extensions import db
 from app.models.user import User
 from app.models.club import Club
@@ -19,18 +19,19 @@ class UserService:
 
     @staticmethod
     def get_all_users(page: int = 1, per_page: int = 20, search: str = None, 
-                     club_id: int = None, is_active: bool = None) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+                     club_id: int = None, is_active: bool = None, is_admin: bool = None) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """Get all users with pagination and filtering"""
         query = User.query
         
         # Apply filters
         if search:
-            search_term = f"%{search}%"
+            # Make search case-insensitive and handle special characters
+            search_term = f"%{search.lower()}%"
             query = query.filter(
                 or_(
-                    User.email.ilike(search_term),
-                    User.first_name.ilike(search_term),
-                    User.last_name.ilike(search_term)
+                    func.lower(User.email).like(search_term),
+                    func.lower(User.first_name).like(search_term),
+                    func.lower(User.last_name).like(search_term)
                 )
             )
         
@@ -39,13 +40,17 @@ class UserService:
             
         if is_active is not None:
             query = query.filter(User.is_active == is_active)
+            
+        if is_admin is not None:
+            query = query.filter(User.is_admin == is_admin)
         
         # Apply pagination
         pagination = query.order_by(User.last_name, User.first_name).paginate(
             page=page, per_page=per_page, error_out=False
         )
         
-        users = [user.to_dict() for user in pagination.items]
+        # Get users with sensitive data (admin info and current handicap)
+        users = [user.to_dict(include_sensitive=True) for user in pagination.items]
         
         meta = {
             'total': pagination.total,
@@ -143,9 +148,15 @@ class UserService:
                 raise ValueError("Preferred theme not found")
 
         try:
+            # Check for email uniqueness if email is being updated
+            if 'email' in user_data and user_data['email'] != user.email:
+                existing_user = User.query.filter_by(email=user_data['email']).first()
+                if existing_user and existing_user.id != user_id:
+                    raise ValueError("Email already in use by another user")
+            
             # Update allowed fields
             updatable_fields = [
-                'first_name', 'last_name', 'sex', 'distance_unit', 'timezone',
+                'email', 'first_name', 'last_name', 'sex', 'distance_unit', 'timezone',
                 'country', 'city', 'address', 'postal_code', 'home_club_id',
                 'preferred_theme_id', 'is_active'
             ]

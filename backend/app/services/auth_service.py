@@ -31,7 +31,10 @@ def token_required(f):
 def admin_required(f):
     """
     Decorator to require admin privileges for route access.
-    Checks both authentication and admin role.
+    Checks both authentication and current admin role from database.
+    
+    SECURITY: Always validates admin status from database, not just JWT claims
+    to prevent privilege escalation from stale tokens.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -40,18 +43,33 @@ def admin_required(f):
             verify_jwt_in_request()
             
             # Get user identity from token
-            current_user_id = get_jwt_identity()
-            claims = get_jwt()
+            current_user_id = int(get_jwt_identity())
             
-            # Check if user has admin role
-            # TODO: Replace with actual admin check when User model is implemented
-            user_is_admin = claims.get('is_admin', False)
+            # SECURITY FIX: Always check current admin status from database
+            # Don't trust JWT claims for admin verification
+            from app.services.user_service import UserService
+            current_user = UserService.get_user_by_id(current_user_id, include_sensitive=True)
             
-            if not user_is_admin:
+            if not current_user:
+                return jsonify({
+                    "success": False,
+                    "error": "User not found",
+                    "message": "Invalid user token"
+                }), 401
+            
+            # Verify user is active and admin based on current database state
+            if not current_user.get('is_active', False):
+                return jsonify({
+                    "success": False,
+                    "error": "Account deactivated",
+                    "message": "User account has been deactivated"
+                }), 403
+                
+            if not current_user.get('is_admin', False):
                 return jsonify({
                     "success": False,
                     "error": "Admin access required",
-                    "message": "Insufficient privileges"
+                    "message": "Insufficient privileges - admin access required"
                 }), 403
                 
             return f(*args, **kwargs)
@@ -59,7 +77,7 @@ def admin_required(f):
         except Exception as e:
             return jsonify({
                 "success": False,
-                "error": "Authentication required",
+                "error": "Authentication failed",
                 "message": "Valid admin token required"
             }), 401
     return decorated_function
